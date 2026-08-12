@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
-  final List<String> gearList = const [
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  late List<String> gearList = [
     'DiGiCo SD10',
     'Yamaha QL5',
     'Sennheiser IEM',
     'L-Acoustics Kara',
     'Shure Axient',
+  ];
+
+  late List<String> skillsList = [
+    'Звуковой баланс',
+    'Работа с мониторами',
+    'Миксирование вживую',
+    'Работа с DiGiCo',
   ];
 
   // Даты: номер → статус (null=обычный, true=свободен, false=занят)
@@ -22,6 +34,114 @@ class ProfileScreen extends StatelessWidget {
     23: true,
     26: false,
   };
+
+  void _addGear(String gear) {
+    if (gear.isNotEmpty && !gearList.contains(gear)) {
+      setState(() {
+        gearList.add(gear);
+      });
+    }
+  }
+
+  void _removeGear(String gear) {
+    setState(() {
+      gearList.remove(gear);
+    });
+  }
+
+  void _addSkill(String skill) {
+    if (skill.isNotEmpty && !skillsList.contains(skill)) {
+      setState(() {
+        skillsList.add(skill);
+      });
+    }
+  }
+
+  void _removeSkill(String skill) {
+    setState(() {
+      skillsList.remove(skill);
+    });
+  }
+
+  void _showAddGearDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1E),
+        title: const Text('Добавить оборудование'),
+        content: TextField(
+          controller: controller,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Название оборудования',
+            hintStyle: const TextStyle(color: Colors.white54),
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.white24),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.blue),
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () {
+              _addGear(controller.text);
+              Navigator.pop(ctx);
+            },
+            child: const Text('Добавить'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddSkillDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1C1C1E),
+        title: const Text('Добавить скил'),
+        content: TextField(
+          controller: controller,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Название скила',
+            hintStyle: const TextStyle(color: Colors.white54),
+            enabledBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.white24),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: const BorderSide(color: Colors.blue),
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () {
+              _addSkill(controller.text);
+              Navigator.pop(ctx);
+            },
+            child: const Text('Добавить'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,26 +226,176 @@ class ProfileScreen extends StatelessWidget {
             // Gear List
             _buildSectionTitle('Моё оборудование'),
             const SizedBox(height: 12),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 3,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1C1C1E),
+                borderRadius: BorderRadius.circular(12),
               ),
-              itemCount: gearList.length + 1,
-              itemBuilder: (context, index) {
-                if (index == gearList.length) {
-                  return _GearChip(
-                    text: 'Добавить...',
-                    isAdd: true,
-                    onTap: () {},
-                  );
-                }
-                return _GearChip(text: gearList[index]);
-              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (gearList.isEmpty)
+                    const Text(
+                      'Оборудование не добавлено',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white54,
+                      ),
+                    )
+                  else
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: gearList.map((gear) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2C2C2E),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                gear,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: () => _removeGear(gear),
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Colors.white54,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: _showAddGearDialog,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white24),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add, size: 18, color: Colors.white54),
+                          SizedBox(width: 4),
+                          Text(
+                            'Добавить оборудование',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Skills
+            _buildSectionTitle('Мои скилы'),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1C1C1E),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (skillsList.isEmpty)
+                    const Text(
+                      'Скилы не добавлены',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white54,
+                      ),
+                    )
+                  else
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: skillsList.map((skill) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                skill,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              GestureDetector(
+                                onTap: () => _removeSkill(skill),
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 16,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTap: _showAddSkillDialog,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white24),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add, size: 18, color: Colors.white54),
+                          SizedBox(width: 4),
+                          Text(
+                            'Добавить скил',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white54,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
             // Календарь
@@ -183,34 +453,76 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildCalendar() {
     final days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-    final dates = List.generate(20, (i) => i + 12); // 12-31
+    final currentDate = DateTime.now();
+    final firstDayOfMonth = DateTime(currentDate.year, currentDate.month, 1);
+    final lastDayOfMonth = DateTime(currentDate.year, currentDate.month + 1, 0);
+    
+    // Определяем, на каком дне недели начинается месяц (0=пн, 6=вс)
+    final firstWeekday = firstDayOfMonth.weekday - 1;
+    final daysInMonth = lastDayOfMonth.day;
+    
+    // Создаем список всех клеток календаря (включая пустые в начале)
+    final calendarDays = <int?>[];
+    
+    // Добавляем пустые клетки в начало
+    for (int i = 0; i < firstWeekday; i++) {
+      calendarDays.add(null);
+    }
+    
+    // Добавляем дни месяца
+    for (int i = 1; i <= daysInMonth; i++) {
+      calendarDays.add(i);
+    }
 
     return Column(
       children: [
+        // Заголовок месяца
+        Text(
+          '${_getMonthName(currentDate.month)} ${currentDate.year}',
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.white54,
+          ),
+        ),
+        const SizedBox(height: 16),
         // Дни недели
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: days
               .map((d) => SizedBox(
-                    width: 36,
+                    width: 40,
                     child: Text(
                       d,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 12,
+                        fontWeight: FontWeight.w500,
                         color: Colors.white38,
                       ),
                     ),
                   ))
               .toList(),
         ),
-        const SizedBox(height: 8),
-        // Даты
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: dates.map((date) {
-            final status = calendar[date];
+        const SizedBox(height: 12),
+        // Сетка дней
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 7,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            childAspectRatio: 1,
+          ),
+          itemCount: calendarDays.length,
+          itemBuilder: (context, index) {
+            final day = calendarDays[index];
+            
+            if (day == null) {
+              return Container();
+            }
+            
+            final status = calendar[day];
             Color bgColor = const Color(0xFF1C1C1E);
             Color textColor = Colors.white70;
 
@@ -223,77 +535,32 @@ class ProfileScreen extends StatelessWidget {
             }
 
             return Container(
-              width: 36,
-              height: 36,
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.center,
               child: Text(
-                '$date',
+                '$day',
                 style: TextStyle(
                   fontSize: 13,
+                  fontWeight: FontWeight.w500,
                   color: textColor,
                 ),
               ),
             );
-          }).toList(),
+          },
         ),
       ],
     );
   }
-}
 
-class _GearChip extends StatelessWidget {
-  final String text;
-  final bool isAdd;
-  final VoidCallback? onTap;
-
-  const _GearChip({
-    required this.text,
-    this.isAdd = false,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFF1C1C1E),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: isAdd ? Colors.white24 : Colors.transparent,
-          ),
-        ),
-        alignment: Alignment.center,
-        child: isAdd
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.add, size: 16, color: Colors.white54),
-                  const SizedBox(width: 4),
-                  Text(
-                    text,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.white54,
-                    ),
-                  ),
-                ],
-              )
-            : Text(
-                text,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: Colors.white70,
-                ),
-                textAlign: TextAlign.center,
-              ),
-      ),
-    );
+  String _getMonthName(int month) {
+    const months = [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ];
+    return months[month - 1];
   }
 }
 
