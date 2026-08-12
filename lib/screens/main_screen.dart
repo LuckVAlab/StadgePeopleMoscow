@@ -23,6 +23,13 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  void _onOrderCreated() {
+    // Переключаемся на вкладку "Лента" после создания заказа
+    setState(() {
+      _currentIndex = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isSpec = _role == 'spec';
@@ -35,7 +42,7 @@ class _MainScreenState extends State<MainScreen> {
         : [
             FeedScreen(role: _role, onRoleChanged: _onRoleChanged),
             const ProfileScreen(),
-            const CreateOrderScreen(),
+            CreateOrderScreen(onOrderCreated: _onOrderCreated),
           ];
 
     final navItems = isSpec

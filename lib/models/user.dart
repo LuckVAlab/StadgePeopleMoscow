@@ -9,7 +9,8 @@ class User {
   final int reviewsCount;
   final List<String> equipment;
   final List<String> skills;
-  final Map<int, bool?> calendar; // день месяца -> true(свободен), false(занят), null(обычный)
+  final Map<int, bool?>
+      calendar; // день месяца -> true(свободен), false(занят), null(обычный)
   final String subscription; // название подписки (EventOS Pro, Free)
   final DateTime subscriptionExpiresAt;
   final DateTime createdAt;
@@ -64,7 +65,8 @@ class User {
       skills: skills ?? this.skills,
       calendar: calendar ?? this.calendar,
       subscription: subscription ?? this.subscription,
-      subscriptionExpiresAt: subscriptionExpiresAt ?? this.subscriptionExpiresAt,
+      subscriptionExpiresAt:
+          subscriptionExpiresAt ?? this.subscriptionExpiresAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -108,7 +110,8 @@ class User {
         (k, v) => MapEntry(int.parse(k), v as bool?),
       ),
       subscription: json['subscription'] as String,
-      subscriptionExpiresAt: DateTime.parse(json['subscriptionExpiresAt'] as String),
+      subscriptionExpiresAt:
+          DateTime.parse(json['subscriptionExpiresAt'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );

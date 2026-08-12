@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
 class CreateOrderScreen extends StatefulWidget {
-  const CreateOrderScreen({super.key});
+  final VoidCallback? onOrderCreated;
+
+  const CreateOrderScreen({
+    super.key,
+    this.onOrderCreated,
+  });
 
   @override
   State<CreateOrderScreen> createState() => _CreateOrderScreenState();
@@ -9,7 +14,7 @@ class CreateOrderScreen extends StatefulWidget {
 
 class _CreateOrderScreenState extends State<CreateOrderScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   // Контроллеры для полей
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
@@ -84,9 +89,24 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     if (_formKey.currentState!.validate()) {
       // TODO: Создать заказ и отправить на сервер
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Заказ создан!')),
+        const SnackBar(content: Text('Заказ создан успешно!')),
       );
-      Navigator.pop(context);
+      
+      // Вызываем callback если он есть
+      widget.onOrderCreated?.call();
+      
+      // Очищаем форму
+      _titleController.clear();
+      _descriptionController.clear();
+      _priceController.clear();
+      _locationController.clear();
+      _timeController.clear();
+      _tagController.clear();
+      setState(() {
+        _tags.clear();
+        _selectedDate = null;
+        _selectedCategory = 'Звукорежиссёр';
+      });
     }
   }
 
@@ -199,7 +219,8 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
               GestureDetector(
                 onTap: _selectDate,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1C1C1E),
                     borderRadius: BorderRadius.circular(8),
@@ -207,7 +228,8 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 18, color: Colors.white54),
+                      const Icon(Icons.calendar_today,
+                          size: 18, color: Colors.white54),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -215,7 +237,9 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                               ? '${_selectedDate!.day} ${_getMonthName(_selectedDate!.month)}'
                               : 'Выберите дату',
                           style: TextStyle(
-                            color: _selectedDate != null ? Colors.white70 : Colors.white54,
+                            color: _selectedDate != null
+                                ? Colors.white70
+                                : Colors.white54,
                           ),
                         ),
                       ),
@@ -292,7 +316,8 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                     int index = entry.key;
                     String tag = entry.value;
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.blue.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(8),
@@ -391,8 +416,18 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
   String _getMonthName(int month) {
     const months = [
-      'янв', 'фев', 'мар', 'апр', 'май', 'июн',
-      'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'
+      'янв',
+      'фев',
+      'мар',
+      'апр',
+      'май',
+      'июн',
+      'июл',
+      'авг',
+      'сен',
+      'окт',
+      'ноя',
+      'дек'
     ];
     return months[month - 1];
   }

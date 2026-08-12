@@ -353,7 +353,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       runSpacing: 8,
                       children: gearList.map((gear) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
                             color: const Color(0xFF2C2C2E),
                             borderRadius: BorderRadius.circular(8),
@@ -440,11 +441,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       runSpacing: 8,
                       children: skillsList.map((skill) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
                           decoration: BoxDecoration(
                             color: Colors.blue.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                            border:
+                                Border.all(color: Colors.blue.withOpacity(0.3)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -559,19 +562,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final currentDate = DateTime.now();
     final firstDayOfMonth = DateTime(currentDate.year, currentDate.month, 1);
     final lastDayOfMonth = DateTime(currentDate.year, currentDate.month + 1, 0);
-    
+
     // Определяем, на каком дне недели начинается месяц (0=пн, 6=вс)
     final firstWeekday = firstDayOfMonth.weekday - 1;
     final daysInMonth = lastDayOfMonth.day;
-    
+
     // Создаем список всех клеток календаря (включая пустые в начале)
     final calendarDays = <int?>[];
-    
+
     // Добавляем пустые клетки в начало
     for (int i = 0; i < firstWeekday; i++) {
       calendarDays.add(null);
     }
-    
+
     // Добавляем дни месяца
     for (int i = 1; i <= daysInMonth; i++) {
       calendarDays.add(i);
@@ -620,11 +623,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           itemCount: calendarDays.length,
           itemBuilder: (context, index) {
             final day = calendarDays[index];
-            
+
             if (day == null) {
               return Container();
             }
-            
+
             final status = calendar[day];
             Color bgColor = const Color(0xFF1C1C1E);
             Color textColor = Colors.white70;
@@ -660,8 +663,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String _getMonthName(int month) {
     const months = [
-      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+      'Январь',
+      'Февраль',
+      'Март',
+      'Апрель',
+      'Май',
+      'Июнь',
+      'Июль',
+      'Август',
+      'Сентябрь',
+      'Октябрь',
+      'Ноябрь',
+      'Декабрь'
     ];
     return months[month - 1];
   }

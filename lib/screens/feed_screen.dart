@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'order_details_screen.dart';
 
 class FeedScreen extends StatefulWidget {
   final String role;
@@ -213,70 +214,80 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    order['title'],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrderDetailsScreen(orderData: order),
+          ),
+        );
+      },
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      order['title'],
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    order['price'],
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
-                Text(
-                  order['price'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                _MetaItem(icon: Icons.calendar_today, text: order['date']),
-                const SizedBox(width: 12),
-                _MetaItem(icon: Icons.location_on_outlined, text: order['location']),
-                const SizedBox(width: 12),
-                _MetaItem(icon: Icons.access_time, text: order['time']),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 6,
-              children: (order['tags'] as List).map((tag) {
-                return Chip(
-                  label: Text(
-                    tag['text'],
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: tag['urgent'] == true
-                          ? Colors.red
-                          : tag['green'] == true
-                              ? Colors.green
-                              : Colors.white70,
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  _MetaItem(icon: Icons.calendar_today, text: order['date']),
+                  const SizedBox(width: 12),
+                  _MetaItem(icon: Icons.location_on_outlined, text: order['location']),
+                  const SizedBox(width: 12),
+                  _MetaItem(icon: Icons.access_time, text: order['time']),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 6,
+                children: (order['tags'] as List).map((tag) {
+                  return Chip(
+                    label: Text(
+                      tag['text'],
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: tag['urgent'] == true
+                            ? Colors.red
+                            : tag['green'] == true
+                                ? Colors.green
+                                : Colors.white70,
+                      ),
                     ),
-                  ),
-                  backgroundColor: tag['urgent'] == true
-                      ? Colors.red.withOpacity(0.15)
-                      : tag['green'] == true
-                          ? Colors.green.withOpacity(0.15)
-                          : const Color(0xFF2C2C2E),
-                  side: BorderSide.none,
-                );
-              }).toList(),
-            ),
-          ],
+                    backgroundColor: tag['urgent'] == true
+                        ? Colors.red.withOpacity(0.15)
+                        : tag['green'] == true
+                            ? Colors.green.withOpacity(0.15)
+                            : const Color(0xFF2C2C2E),
+                    side: BorderSide.none,
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
         ),
       ),
     );

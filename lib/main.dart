@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/main_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
 
 void main() {
   runApp(const StadgePeopleMoscowApp());
@@ -26,7 +28,12 @@ class StadgePeopleMoscowApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const MainScreen(),
+      home: const LoginScreen(),
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/home': (context) => const MainScreen(),
+      },
     );
   }
 }

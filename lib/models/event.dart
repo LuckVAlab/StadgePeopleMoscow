@@ -8,9 +8,11 @@ class Event {
   final DateTime endDate;
   final String organizer; // User ID
   final List<String> requiredSpecialists; // список требуемых специальностей
-  final Map<String, List<String>> teamMembers; // специальность -> список User ID
+  final Map<String, List<String>>
+      teamMembers; // специальность -> список User ID
   final double budget;
-  final String status; // "planning", "recruiting", "ongoing", "completed", "cancelled"
+  final String
+      status; // "planning", "recruiting", "ongoing", "completed", "cancelled"
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -94,7 +96,8 @@ class Event {
       startDate: DateTime.parse(json['startDate'] as String),
       endDate: DateTime.parse(json['endDate'] as String),
       organizer: json['organizer'] as String,
-      requiredSpecialists: List<String>.from(json['requiredSpecialists'] as List),
+      requiredSpecialists:
+          List<String>.from(json['requiredSpecialists'] as List),
       teamMembers: (json['teamMembers'] as Map<String, dynamic>).map(
         (k, v) => MapEntry(k, List<String>.from(v as List)),
       ),

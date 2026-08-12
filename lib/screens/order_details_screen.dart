@@ -127,7 +127,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   const SizedBox(height: 24),
 
                   // Теги/Требования
-                  if (widget.orderData['tags'] != null && (widget.orderData['tags'] as List).isNotEmpty)
+                  if (widget.orderData['tags'] != null &&
+                      (widget.orderData['tags'] as List).isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -142,35 +143,34 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: (widget.orderData['tags'] as List)
-                              .map((tag) {
-                                bool isUrgent = tag is Map && tag['urgent'] == true;
-                                return Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isUrgent
-                                        ? Colors.red.withOpacity(0.15)
-                                        : Colors.white.withOpacity(0.05),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: isUrgent
-                                          ? Colors.red.withOpacity(0.3)
-                                          : Colors.white24,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    tag is Map ? tag['text'] ?? '' : tag.toString(),
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: isUrgent ? Colors.red : Colors.white70,
-                                    ),
-                                  ),
-                                );
-                              })
-                              .toList(),
+                          children:
+                              (widget.orderData['tags'] as List).map((tag) {
+                            bool isUrgent = tag is Map && tag['urgent'] == true;
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isUrgent
+                                    ? Colors.red.withOpacity(0.15)
+                                    : Colors.white.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: isUrgent
+                                      ? Colors.red.withOpacity(0.3)
+                                      : Colors.white24,
+                                ),
+                              ),
+                              child: Text(
+                                tag is Map ? tag['text'] ?? '' : tag.toString(),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: isUrgent ? Colors.red : Colors.white70,
+                                ),
+                              ),
+                            );
+                          }).toList(),
                         ),
                         const SizedBox(height: 24),
                       ],
@@ -202,7 +202,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                           side: BorderSide(
-                            color: _hasResponded ? Colors.green : Colors.transparent,
+                            color: _hasResponded
+                                ? Colors.green
+                                : Colors.transparent,
                           ),
                         ),
                       ),
