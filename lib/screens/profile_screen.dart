@@ -8,6 +8,11 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  bool _isEditMode = false;
+
+  late TextEditingController _nameController;
+  late TextEditingController _specialtyController;
+
   late List<String> gearList = [
     'DiGiCo SD10',
     'Yamaha QL5',
@@ -23,6 +28,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'Работа с DiGiCo',
   ];
 
+  String _userName = 'Алексей Петров';
+  String _userSpecialty = 'Звукорежиссёр • FOH / Мониторы';
+
   // Даты: номер → статус (null=обычный, true=свободен, false=занят)
   final Map<int, bool?> calendar = const {
     13: false,
@@ -34,6 +42,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     23: true,
     26: false,
   };
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: _userName);
+    _specialtyController = TextEditingController(text: _userSpecialty);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _specialtyController.dispose();
+    super.dispose();
+  }
 
   void _addGear(String gear) {
     if (gear.isNotEmpty && !gearList.contains(gear)) {
@@ -154,6 +176,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Center(
+              child: GestureDetector(
+                onTap: () {
+                  if (_isEditMode) {
+                    // Сохранить изменения
+                    setState(() {
+                      _userName = _nameController.text;
+                      _userSpecialty = _specialtyController.text;
+                      _isEditMode = false;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Профиль обновлен')),
+                    );
+                  } else {
+                    setState(() => _isEditMode = true);
+                  }
+                },
+                child: Text(
+                  _isEditMode ? 'Готово' : 'Редакт.',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.blue,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -176,22 +230,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 12),
             // Имя
-            const Text(
-              'Алексей Петров',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
+            if (!_isEditMode)
+              Text(
+                _userName,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              )
+            else
+              TextField(
+                controller: _nameController,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.white24),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.blue),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                ),
               ),
-            ),
             const SizedBox(height: 4),
             // Специальность
-            const Text(
-              'Звукорежиссёр • FOH / Мониторы',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white54,
+            if (!_isEditMode)
+              Text(
+                _userSpecialty,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white54,
+                ),
+              )
+            else
+              TextField(
+                controller: _specialtyController,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white70,
+                ),
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.white24),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.blue),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                ),
               ),
-            ),
             const SizedBox(height: 8),
             // Рейтинг
             Row(
