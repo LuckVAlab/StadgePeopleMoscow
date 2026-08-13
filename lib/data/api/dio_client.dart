@@ -27,12 +27,19 @@ class AuthInterceptor extends Interceptor {
 }
 
 /// Pre-configured Dio instance for all API calls.
+///
+/// Uses a singleton pattern so the [AuthInterceptor] is shared across all
+/// service instances.
 class DioClient {
-  static final AuthInterceptor _authInterceptor = AuthInterceptor();
+  static final DioClient _instance = DioClient._internal();
+  static AuthInterceptor get authInterceptor => _instance._authInterceptor;
 
+  static DioClient get instance => _instance;
+
+  final AuthInterceptor _authInterceptor = AuthInterceptor();
   late final Dio _dio;
 
-  DioClient() {
+  DioClient._internal() {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
@@ -53,5 +60,4 @@ class DioClient {
   }
 
   Dio get dio => _dio;
-  AuthInterceptor get authInterceptor => _authInterceptor;
 }
