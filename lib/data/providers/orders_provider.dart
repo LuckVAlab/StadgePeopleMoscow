@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/order_model.dart';
 import '../services/order_service.dart';
+import '../core/utils/api_error_handler.dart';
 
 /// Order state managed by Riverpod.
-/// Replace with real API integration later.
 class OrdersNotifier extends StateNotifier<AsyncValue<List<OrderModel>>> {
   final OrderService _orderService;
 
@@ -16,8 +16,9 @@ class OrdersNotifier extends StateNotifier<AsyncValue<List<OrderModel>>> {
     try {
       final orders = await _orderService.getOrders();
       state = AsyncValue.data(orders);
-    } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
+    } catch (e) {
+      final message = e is ApiErrorInfo ? e.message : 'Ошибка загрузки заказов';
+      state = AsyncValue.error(message, StackTrace.current);
     }
   }
 
@@ -26,8 +27,9 @@ class OrdersNotifier extends StateNotifier<AsyncValue<List<OrderModel>>> {
       final createdOrder = await _orderService.createOrder(order);
       state.whenData(
           (orders) => state = AsyncValue.data([createdOrder, ...orders]));
-    } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
+    } catch (e) {
+      final message = e is ApiErrorInfo ? e.message : 'Ошибка создания заказа';
+      state = AsyncValue.error(message, StackTrace.current);
     }
   }
 
@@ -41,8 +43,9 @@ class OrdersNotifier extends StateNotifier<AsyncValue<List<OrderModel>>> {
         }).toList();
         state = AsyncValue.data(updatedOrders);
       });
-    } catch (e, stack) {
-      state = AsyncValue.error(e, stack);
+    } catch (e) {
+      final message = e is ApiErrorInfo ? e.message : 'Ошибка отклика';
+      state = AsyncValue.error(message, StackTrace.current);
     }
   }
 }

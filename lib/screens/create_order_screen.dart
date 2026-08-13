@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_theme.dart';
+import '../core/utils/api_error_handler.dart';
 import '../core/constants/app_constants.dart';
 import '../data/models/order_model.dart';
 import '../data/providers/orders_provider.dart';
@@ -125,8 +126,9 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
       });
     } catch (e) {
       if (mounted) {
+        final message = e is ApiErrorInfo ? e.message : 'Ошибка создания заказа';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка: $e')),
+          SnackBar(content: Text(message)),
         );
       }
     } finally {

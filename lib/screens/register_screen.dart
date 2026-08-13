@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/theme/app_theme.dart';
+import '../core/utils/api_error_handler.dart';
 import '../core/constants/app_constants.dart';
 import '../data/models/auth_model.dart';
 import '../data/providers/auth_provider.dart';
@@ -72,8 +73,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           );
     } catch (e) {
       if (mounted) {
+        final message = e is ApiErrorInfo ? e.message : 'Ошибка регистрации';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка регистрации: $e')),
+          SnackBar(content: Text(message)),
         );
       }
     } finally {
