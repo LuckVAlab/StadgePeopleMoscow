@@ -1,45 +1,47 @@
+import '../../core/constants/api_constants.dart';
 import '../models/auth_model.dart';
+import '../api/dio_client.dart';
 
 /// Authentication API service.
-///
-/// Replace mock implementations with real API calls when backend is ready.
 class AuthService {
-  Future<AuthResponse> login(LoginRequest request) async {
-    // TODO: Replace with real API call
-    // final dio = DioClient().dio;
-    // final response = await dio.post(ApiConstants.login, data: request.toJson());
-    // return AuthResponse.fromJson(response.data);
+  final DioClient _dioClient = DioClient();
 
-    // Mock response for now
-    await Future.delayed(const Duration(seconds: 1));
-    return AuthResponse(
-      token: 'mock_token_12345',
-      userId: 'user_001',
-      name: 'Алексей Петров',
-      email: 'alex@example.com',
-      role: 'specialist',
+  DioClient get dioClient => _dioClient;
+
+  Future<AuthResponse> login(LoginRequest request) async {
+    final dio = _dioClient.dio;
+    final response = await dio.post(
+      ApiConstants.login,
+      data: request.toJson(),
     );
+    final data = AuthResponse.fromJson(response.data);
+
+    // Attach token to all subsequent requests
+    _dioClient.authInterceptor.setToken(data.token);
+
+    return data;
   }
 
   Future<AuthResponse> register(RegisterRequest request) async {
-    // TODO: Replace with real API call
-    // final dio = DioClient().dio;
-    // final response = await dio.post(ApiConstants.register, data: request.toJson());
-    // return AuthResponse.fromJson(response.data);
-
-    // Mock response for now
-    await Future.delayed(const Duration(seconds: 1));
-    return AuthResponse(
-      token: 'mock_token_67890',
-      userId: 'user_002',
-      name: request.name,
-      email: request.email,
-      role: 'specialist',
+    final dio = _dioClient.dio;
+    final response = await dio.post(
+      ApiConstants.register,
+      data: request.toJson(),
     );
+    final data = AuthResponse.fromJson(response.data);
+
+    // Attach token to all subsequent requests
+    _dioClient.authInterceptor.setToken(data.token);
+
+    return data;
   }
 
   Future<void> logout() async {
-    // TODO: Call logout endpoint when backend is ready
-    await Future.delayed(const Duration(milliseconds: 300));
+    try {
+      final dio = _dioClient.dio;
+      await dio.post(ApiConstants.profile);
+    } finally {
+      _dioClient.authInterceptor.clearToken();
+    }
   }
 }
