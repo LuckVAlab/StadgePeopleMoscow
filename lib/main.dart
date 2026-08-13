@@ -1,39 +1,28 @@
 import 'package:flutter/material.dart';
-import 'screens/main_screen.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/theme/app_theme.dart';
+import 'core/router/app_router.dart';
 
 void main() {
-  runApp(const StadgePeopleMoscowApp());
+  runApp(
+    const ProviderScope(
+      child: StadgePeopleMoscowApp(),
+    ),
+  );
 }
 
-class StadgePeopleMoscowApp extends StatelessWidget {
+class StadgePeopleMoscowApp extends ConsumerWidget {
   const StadgePeopleMoscowApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
       title: 'StadgePeopleMoscow',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0A0A0A),
-        colorScheme: const ColorScheme.dark(
-          surface: Color(0xFF0A0A0A),
-          surfaceContainerHighest: Color(0xFF1C1C1E),
-        ),
-        cardTheme: CardTheme(
-          color: const Color(0xFF1C1C1E),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      ),
-      home: const LoginScreen(),
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/home': (context) => const MainScreen(),
-      },
+      theme: AppTheme.darkTheme,
+      routerConfig: router,
     );
   }
 }

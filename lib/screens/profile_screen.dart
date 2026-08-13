@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/theme/app_theme.dart';
+import '../widgets/app_tag.dart';
+import '../widgets/app_card.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool _isEditMode = false;
 
-  late TextEditingController _nameController;
-  late TextEditingController _specialtyController;
+  late final TextEditingController _nameController;
+  late final TextEditingController _specialtyController;
 
-  late List<String> gearList = [
+  final List<String> _gearList = [
     'DiGiCo SD10',
     'Yamaha QL5',
     'Sennheiser IEM',
@@ -21,7 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     'Shure Axient',
   ];
 
-  late List<String> skillsList = [
+  final List<String> _skillsList = [
     'Звуковой баланс',
     'Работа с мониторами',
     'Миксирование вживую',
@@ -31,8 +35,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _userName = 'Алексей Петров';
   String _userSpecialty = 'Звукорежиссёр • FOH / Мониторы';
 
-  // Даты: номер → статус (null=обычный, true=свободен, false=занят)
-  final Map<int, bool?> calendar = const {
+  // day number -> status (null=normal, true=available, false=busy)
+  final Map<int, bool?> _calendar = const {
     13: false,
     14: false,
     16: true,
@@ -58,54 +62,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _addGear(String gear) {
-    if (gear.isNotEmpty && !gearList.contains(gear)) {
-      setState(() {
-        gearList.add(gear);
-      });
+    if (gear.isNotEmpty && !_gearList.contains(gear)) {
+      setState(() => _gearList.add(gear));
     }
   }
 
   void _removeGear(String gear) {
-    setState(() {
-      gearList.remove(gear);
-    });
+    setState(() => _gearList.remove(gear));
   }
 
   void _addSkill(String skill) {
-    if (skill.isNotEmpty && !skillsList.contains(skill)) {
-      setState(() {
-        skillsList.add(skill);
-      });
+    if (skill.isNotEmpty && !_skillsList.contains(skill)) {
+      setState(() => _skillsList.add(skill));
     }
   }
 
   void _removeSkill(String skill) {
-    setState(() {
-      skillsList.remove(skill);
-    });
+    setState(() => _skillsList.remove(skill));
   }
 
-  void _showAddGearDialog() {
+  void _showAddDialog(String title, String hint, void Function(String) onAdd) {
     final controller = TextEditingController();
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1C1C1E),
-        title: const Text('Добавить оборудование'),
+        title: Text(title),
         content: TextField(
           controller: controller,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: AppTheme.textPrimary),
           decoration: InputDecoration(
-            hintText: 'Название оборудования',
-            hintStyle: const TextStyle(color: Colors.white54),
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.white24),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.blue),
-              borderRadius: BorderRadius.circular(8),
-            ),
+            hintText: hint,
+            hintStyle: const TextStyle(color: AppTheme.textMuted),
           ),
         ),
         actions: [
@@ -115,47 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           TextButton(
             onPressed: () {
-              _addGear(controller.text);
-              Navigator.pop(ctx);
-            },
-            child: const Text('Добавить'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAddSkillDialog() {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1C1C1E),
-        title: const Text('Добавить скил'),
-        content: TextField(
-          controller: controller,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            hintText: 'Название скила',
-            hintStyle: const TextStyle(color: Colors.white54),
-            enabledBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.white24),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: const BorderSide(color: Colors.blue),
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () {
-              _addSkill(controller.text);
+              onAdd(controller.text);
               Navigator.pop(ctx);
             },
             child: const Text('Добавить'),
@@ -169,13 +116,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0A0A),
-        elevation: 0,
-        title: const Text(
-          'Профиль',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-        ),
-        centerTitle: true,
+        title: const Text('Профиль'),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
@@ -183,7 +124,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: GestureDetector(
                 onTap: () {
                   if (_isEditMode) {
-                    // Сохранить изменения
                     setState(() {
                       _userName = _nameController.text;
                       _userSpecialty = _specialtyController.text;
@@ -201,7 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                    color: Colors.blue,
+                    color: AppTheme.primary,
                   ),
                 ),
               ),
@@ -214,198 +154,125 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           children: [
             const SizedBox(height: 16),
-            // Аватар
+            // Avatar
             Container(
               width: 80,
               height: 80,
-              decoration: BoxDecoration(
-                color: const Color(0xFF2C2C2E),
+              decoration: const BoxDecoration(
+                color: AppTheme.surfaceLight,
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.person,
                 size: 40,
-                color: Colors.white38,
+                color: AppTheme.textDisabled,
               ),
             ),
             const SizedBox(height: 12),
-            // Имя
+            // Name
             if (!_isEditMode)
-              Text(
-                _userName,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                ),
-              )
+              Text(_userName,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w500))
             else
               TextField(
                 controller: _nameController,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  color: AppTheme.textPrimary,
                 ),
                 textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.white24),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 10,
                   ),
                 ),
               ),
             const SizedBox(height: 4),
-            // Специальность
+            // Specialty
             if (!_isEditMode)
-              Text(
-                _userSpecialty,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.white54,
-                ),
-              )
+              Text(_userSpecialty, style: AppTheme.caption)
             else
               TextField(
                 controller: _specialtyController,
                 style: const TextStyle(
                   fontSize: 14,
-                  color: Colors.white70,
+                  color: AppTheme.textSecondary,
                 ),
                 textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.white24),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.blue),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 10,
                   ),
                 ),
               ),
             const SizedBox(height: 8),
-            // Рейтинг
+            // Rating
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ...List.generate(
-                    5,
-                    (i) => const Icon(
-                          Icons.star,
-                          size: 16,
-                          color: Colors.amber,
-                        )),
+                  5,
+                  (_) => const Icon(Icons.star,
+                      size: 16, color: AppTheme.warning),
+                ),
                 const SizedBox(width: 6),
-                const Text(
-                  '4.9',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                const Text('4.9',
+                    style: TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w500)),
                 const SizedBox(width: 4),
-                const Text(
-                  '(23 отзыва)',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white54,
-                  ),
-                ),
+                const Text('(23 отзыва)', style: AppTheme.caption),
               ],
             ),
             const SizedBox(height: 24),
-            // Gear List
+            // Gear
             _buildSectionTitle('Моё оборудование'),
             const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1C1C1E),
-                borderRadius: BorderRadius.circular(12),
-              ),
+            AppCard(
+              margin: EdgeInsets.zero,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (gearList.isEmpty)
-                    const Text(
-                      'Оборудование не добавлено',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white54,
-                      ),
-                    )
+                  if (_gearList.isEmpty)
+                    const Text('Оборудование не добавлено',
+                        style: AppTheme.body)
                   else
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: gearList.map((gear) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2C2C2E),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                gear,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.white70,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              GestureDetector(
-                                onTap: () => _removeGear(gear),
-                                child: const Icon(
-                                  Icons.close,
-                                  size: 16,
-                                  color: Colors.white54,
-                                ),
-                              ),
-                            ],
-                          ),
+                      children: _gearList.map((gear) {
+                        return AppTag(
+                          text: gear,
+                          style: TagStyle.normal,
+                          onRemove: () => _removeGear(gear),
                         );
                       }).toList(),
                     ),
                   const SizedBox(height: 12),
                   GestureDetector(
-                    onTap: _showAddGearDialog,
+                    onTap: () => _showAddDialog(
+                      'Добавить оборудование',
+                      'Название оборудования',
+                      _addGear,
+                    ),
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white24),
+                        border: Border.all(color: AppTheme.textMuted),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.add, size: 18, color: Colors.white54),
+                          Icon(Icons.add, size: 18, color: AppTheme.textMuted),
                           SizedBox(width: 4),
-                          Text(
-                            'Добавить оборудование',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white54,
-                            ),
-                          ),
+                          Text('Добавить оборудование',
+                              style: AppTheme.caption),
                         ],
                       ),
                     ),
@@ -417,85 +284,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Skills
             _buildSectionTitle('Мои скилы'),
             const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1C1C1E),
-                borderRadius: BorderRadius.circular(12),
-              ),
+            AppCard(
+              margin: EdgeInsets.zero,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (skillsList.isEmpty)
-                    const Text(
-                      'Скилы не добавлены',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white54,
-                      ),
-                    )
+                  if (_skillsList.isEmpty)
+                    const Text('Скилы не добавлены', style: AppTheme.body)
                   else
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
-                      children: skillsList.map((skill) {
-                        return Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(8),
-                            border:
-                                Border.all(color: Colors.blue.withOpacity(0.3)),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                skill,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              GestureDetector(
-                                onTap: () => _removeSkill(skill),
-                                child: const Icon(
-                                  Icons.close,
-                                  size: 16,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            ],
-                          ),
+                      children: _skillsList.map((skill) {
+                        return AppTag(
+                          text: skill,
+                          style: TagStyle.success,
+                          onRemove: () => _removeSkill(skill),
                         );
                       }).toList(),
                     ),
                   const SizedBox(height: 12),
                   GestureDetector(
-                    onTap: _showAddSkillDialog,
+                    onTap: () => _showAddDialog(
+                      'Добавить скил',
+                      'Название скила',
+                      _addSkill,
+                    ),
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white24),
+                        border: Border.all(color: AppTheme.textMuted),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.add, size: 18, color: Colors.white54),
+                          Icon(Icons.add, size: 18, color: AppTheme.textMuted),
                           SizedBox(width: 4),
-                          Text(
-                            'Добавить скил',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.white54,
-                            ),
-                          ),
+                          Text('Добавить скил', style: AppTheme.caption),
                         ],
                       ),
                     ),
@@ -504,37 +332,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // Календарь
+            // Calendar
             _buildSectionTitle('Календарь занятости'),
             const SizedBox(height: 12),
             _buildCalendar(),
             const SizedBox(height: 12),
-            // Легенда
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _LegendItem(color: Colors.green, label: 'Свободен'),
-                const SizedBox(width: 16),
-                _LegendItem(color: Colors.red, label: 'Занят'),
+                _LegendItem(color: AppTheme.success, label: 'Свободен'),
+                SizedBox(width: 16),
+                _LegendItem(color: AppTheme.error, label: 'Занят'),
               ],
             ),
             const SizedBox(height: 24),
-            // Подписка
+            // Subscription
             _buildSectionTitle('Подписка'),
             const SizedBox(height: 12),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1C1C1E),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Text(
+            const AppCard(
+              margin: EdgeInsets.zero,
+              child: Text(
                 'EventOS Pro — до 15 сентября',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white70,
-                ),
+                style: AppTheme.body,
               ),
             ),
             const SizedBox(height: 32),
@@ -549,10 +368,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       alignment: Alignment.centerLeft,
       child: Text(
         title,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-        ),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       ),
     );
   }
@@ -563,35 +379,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final firstDayOfMonth = DateTime(currentDate.year, currentDate.month, 1);
     final lastDayOfMonth = DateTime(currentDate.year, currentDate.month + 1, 0);
 
-    // Определяем, на каком дне недели начинается месяц (0=пн, 6=вс)
     final firstWeekday = firstDayOfMonth.weekday - 1;
     final daysInMonth = lastDayOfMonth.day;
 
-    // Создаем список всех клеток календаря (включая пустые в начале)
     final calendarDays = <int?>[];
-
-    // Добавляем пустые клетки в начало
     for (int i = 0; i < firstWeekday; i++) {
       calendarDays.add(null);
     }
-
-    // Добавляем дни месяца
     for (int i = 1; i <= daysInMonth; i++) {
       calendarDays.add(i);
     }
 
     return Column(
       children: [
-        // Заголовок месяца
         Text(
           '${_getMonthName(currentDate.month)} ${currentDate.year}',
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.white54,
-          ),
+          style: AppTheme.caption,
         ),
         const SizedBox(height: 16),
-        // Дни недели
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: days
@@ -603,14 +408,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white38,
+                        color: AppTheme.textDisabled,
                       ),
                     ),
                   ))
               .toList(),
         ),
         const SizedBox(height: 12),
-        // Сетка дней
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -623,22 +427,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
           itemCount: calendarDays.length,
           itemBuilder: (context, index) {
             final day = calendarDays[index];
+            if (day == null) return Container();
 
-            if (day == null) {
-              return Container();
-            }
-
-            final status = calendar[day];
-            Color bgColor = const Color(0xFF1C1C1E);
-            Color textColor = Colors.white70;
-
-            if (status == true) {
-              bgColor = Colors.green.withOpacity(0.15);
-              textColor = Colors.green;
-            } else if (status == false) {
-              bgColor = Colors.red.withOpacity(0.15);
-              textColor = Colors.red;
-            }
+            final status = _calendar[day];
+            final (bgColor, textColor) = switch (status) {
+              true => (
+                  AppTheme.success.withOpacity(0.15),
+                  AppTheme.success,
+                ),
+              false => (
+                  AppTheme.error.withOpacity(0.15),
+                  AppTheme.error,
+                ),
+              null => (
+                  AppTheme.surface,
+                  AppTheme.textSecondary,
+                ),
+            };
 
             return Container(
               decoration: BoxDecoration(
@@ -663,18 +468,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String _getMonthName(int month) {
     const months = [
-      'Январь',
-      'Февраль',
-      'Март',
-      'Апрель',
-      'Май',
-      'Июнь',
-      'Июль',
-      'Август',
-      'Сентябрь',
-      'Октябрь',
-      'Ноябрь',
-      'Декабрь'
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
     ];
     return months[month - 1];
   }
@@ -699,10 +494,7 @@ class _LegendItem extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 6),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, color: Colors.white54),
-        ),
+        Text(label, style: AppTheme.small),
       ],
     );
   }

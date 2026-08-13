@@ -1,28 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../core/theme/app_theme.dart';
+import '../data/models/order_model.dart';
+import '../widgets/app_card.dart';
+import '../widgets/app_tag.dart';
 
-class OrderDetailsScreen extends StatefulWidget {
+class OrderDetailsScreen extends ConsumerStatefulWidget {
   final Map<String, dynamic> orderData;
 
-  const OrderDetailsScreen({
-    super.key,
-    required this.orderData,
-  });
+  const OrderDetailsScreen({super.key, required this.orderData});
 
   @override
-  State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
+  ConsumerState<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
 }
 
-class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
+class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
   bool _hasResponded = false;
 
   void _respondToOrder() {
-    setState(() {
-      _hasResponded = !_hasResponded;
-    });
+    setState(() => _hasResponded = !_hasResponded);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          _hasResponded ? 'Вы откликнулись на заказ' : 'Откклик отменен',
+          _hasResponded ? 'Вы откликнулись на заказ' : 'Отклик отменен',
         ),
       ),
     );
@@ -30,34 +31,31 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final order = OrderModel.fromJson(widget.orderData);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0A0A),
-        elevation: 0,
+        title: const Text('Детали заказа'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
-        title: const Text('Детали заказа'),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Хедер
+            // Header
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
-              color: const Color(0xFF1C1C1E),
+              color: AppTheme.surface,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.orderData['title'] ?? 'Без названия',
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    order.title,
+                    style: AppTheme.title,
                   ),
                   const SizedBox(height: 8),
                   Row(
@@ -68,24 +66,23 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.15),
+                          color: AppTheme.primary.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          widget.orderData['category'] ?? 'Категория',
+                          order.category,
                           style: const TextStyle(
                             fontSize: 12,
-                            color: Colors.blue,
+                            color: AppTheme.primary,
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        widget.orderData['price'] ?? '0 ₽',
+                        order.price,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -99,76 +96,42 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Информация
                   _buildInfoSection('Основная информация', [
-                    ('Дата', widget.orderData['date'] ?? 'Не указана'),
-                    ('Место', widget.orderData['location'] ?? 'Не указано'),
-                    ('Время', widget.orderData['time'] ?? 'Не указано'),
+                    ('Дата', order.date),
+                    ('Место', order.location),
+                    ('Время', order.time),
                   ]),
                   const SizedBox(height: 24),
 
-                  // Описание
-                  const Text(
-                    'Описание',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  const Text('Описание', style: AppTheme.subtitle),
                   const SizedBox(height: 8),
                   Text(
-                    widget.orderData['description'] ?? 'Описание отсутствует',
+                    order.description,
                     style: const TextStyle(
                       fontSize: 14,
-                      color: Colors.white70,
+                      color: AppTheme.textSecondary,
                       height: 1.5,
                     ),
                   ),
                   const SizedBox(height: 24),
 
-                  // Теги/Требования
-                  if (widget.orderData['tags'] != null &&
-                      (widget.orderData['tags'] as List).isNotEmpty)
+                  // Tags / Requirements
+                  if (order.tags.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Требования',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        const Text('Требования', style: AppTheme.subtitle),
                         const SizedBox(height: 12),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children:
-                              (widget.orderData['tags'] as List).map((tag) {
-                            bool isUrgent = tag is Map && tag['urgent'] == true;
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isUrgent
-                                    ? Colors.red.withOpacity(0.15)
-                                    : Colors.white.withOpacity(0.05),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: isUrgent
-                                      ? Colors.red.withOpacity(0.3)
-                                      : Colors.white24,
-                                ),
-                              ),
-                              child: Text(
-                                tag is Map ? tag['text'] ?? '' : tag.toString(),
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: isUrgent ? Colors.red : Colors.white70,
-                                ),
-                              ),
+                          children: order.tags.map((tag) {
+                            final style = tag.isUrgent
+                                ? TagStyle.urgent
+                                : TagStyle.normal;
+                            return AppTag(
+                              text: tag.text,
+                              style: style,
                             );
                           }).toList(),
                         ),
@@ -176,36 +139,31 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                       ],
                     ),
 
-                  // Информация о заказчике
                   _buildInfoSection('О заказчике', [
-                    ('Имя', widget.orderData['clientName'] ?? 'Не указано'),
-                    ('Телефон', widget.orderData['clientPhone'] ?? 'Не указан'),
+                    ('Имя', order.clientName),
+                    ('Телефон', order.clientPhone),
                     (
                       'Рейтинг',
-                      widget.orderData['clientRating'] != null
-                          ? '${widget.orderData['clientRating']} ⭐'
+                      order.clientRating != null
+                          ? '${order.clientRating} ⭐'
                           : 'Новый'
                     ),
                   ]),
                   const SizedBox(height: 32),
 
-                  // Кнопка отклика
+                  // Response button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _respondToOrder,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _hasResponded
-                            ? Colors.green.withOpacity(0.2)
-                            : Colors.blue,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: _hasResponded
-                                ? Colors.green
-                                : Colors.transparent,
-                          ),
+                            ? AppTheme.success.withOpacity(0.2)
+                            : AppTheme.primary,
+                        side: BorderSide(
+                          color: _hasResponded
+                              ? AppTheme.success
+                              : Colors.transparent,
                         ),
                       ),
                       child: Text(
@@ -213,33 +171,18 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: _hasResponded ? Colors.green : Colors.white,
+                          color: _hasResponded ? AppTheme.success : Colors.white,
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // Кнопка отмены
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.white24),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Закрыть',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white70,
-                        ),
-                      ),
+                      onPressed: () => context.pop(),
+                      child: const Text('Закрыть'),
                     ),
                   ),
                 ],
@@ -251,27 +194,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
     );
   }
 
-  Widget _buildInfoSection(
-    String title,
-    List<(String, String)> items,
-  ) {
+  Widget _buildInfoSection(String title, List<(String, String)> items) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(title, style: AppTheme.subtitle),
         const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1C1C1E),
-            borderRadius: BorderRadius.circular(8),
-          ),
+        AppCard(
+          margin: EdgeInsets.zero,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: items
@@ -281,19 +211,13 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          item.$1,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.white54,
-                          ),
-                        ),
+                        Text(item.$1, style: AppTheme.caption),
                         Text(
                           item.$2,
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white70,
+                            color: AppTheme.textSecondary,
                           ),
                         ),
                       ],

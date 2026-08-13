@@ -1,58 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/providers/role_provider.dart';
 import 'feed_screen.dart';
 import 'profile_screen.dart';
 import 'create_order_screen.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  ConsumerState<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends ConsumerState<MainScreen> {
   int _currentIndex = 0;
-  String _role = 'spec';
-
-  void _onRoleChanged(String role) {
-    setState(() {
-      _role = role;
-      if (_role == 'spec' && _currentIndex == 2) {
-        _currentIndex = 0;
-      }
-    });
-  }
 
   void _onOrderCreated() {
-    // Переключаемся на вкладку "Лента" после создания заказа
-    setState(() {
-      _currentIndex = 0;
-    });
+    setState(() => _currentIndex = 0);
   }
 
   @override
   Widget build(BuildContext context) {
-    final isSpec = _role == 'spec';
+    final role = ref.watch(roleProvider);
+    final isSpec = role == UserRole.specialist;
 
     final screens = isSpec
         ? [
-            FeedScreen(role: _role, onRoleChanged: _onRoleChanged),
+            const FeedScreen(),
             const ProfileScreen(),
           ]
         : [
-            FeedScreen(role: _role, onRoleChanged: _onRoleChanged),
+            const FeedScreen(),
             const ProfileScreen(),
             CreateOrderScreen(onOrderCreated: _onOrderCreated),
           ];
 
     final navItems = isSpec
         ? const [
-            BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Лента'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Профиль'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined), label: 'Лента'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline), label: 'Профиль'),
           ]
         : const [
-            BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Лента'),
-            BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Профиль'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home_outlined), label: 'Лента'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person_outline), label: 'Профиль'),
             BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Создать'),
           ];
 
@@ -64,10 +58,6 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex < screens.length ? _currentIndex : 0,
         onTap: (index) => setState(() => _currentIndex = index),
-        backgroundColor: const Color(0xFF0A0A0A),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white38,
-        type: BottomNavigationBarType.fixed,
         items: navItems,
       ),
     );

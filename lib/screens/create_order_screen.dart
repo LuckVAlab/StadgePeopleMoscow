@@ -1,38 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/theme/app_theme.dart';
+import '../core/constants/app_constants.dart';
+import '../data/models/order_model.dart';
+import '../data/providers/orders_provider.dart';
+import '../widgets/app_text_field.dart';
+import '../widgets/app_dropdown.dart';
+import '../widgets/app_tag.dart';
 
-class CreateOrderScreen extends StatefulWidget {
+class CreateOrderScreen extends ConsumerStatefulWidget {
   final VoidCallback? onOrderCreated;
 
-  const CreateOrderScreen({
-    super.key,
-    this.onOrderCreated,
-  });
+  const CreateOrderScreen({super.key, this.onOrderCreated});
 
   @override
-  State<CreateOrderScreen> createState() => _CreateOrderScreenState();
+  ConsumerState<CreateOrderScreen> createState() => _CreateOrderScreenState();
 }
 
-class _CreateOrderScreenState extends State<CreateOrderScreen> {
+class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // Контроллеры для полей
-  late TextEditingController _titleController;
-  late TextEditingController _descriptionController;
-  late TextEditingController _priceController;
-  late TextEditingController _locationController;
-  late TextEditingController _timeController;
-  late TextEditingController _tagController;
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _priceController;
+  late final TextEditingController _locationController;
+  late final TextEditingController _timeController;
+  late final TextEditingController _tagController;
 
-  String _selectedCategory = 'Звукорежиссёр';
-  List<String> _tags = [];
+  String _selectedCategory = AppConstants.orderCategories.first;
+  final List<String> _tags = [];
   DateTime? _selectedDate;
-
-  final List<String> _categories = [
-    'Звукорежиссёр',
-    'Бэклайнер',
-    'Техник',
-    'Мониторист',
-  ];
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -57,7 +55,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   }
 
   void _addTag() {
-    if (_tagController.text.isNotEmpty) {
+    if (_tagController.text.isNotEmpty && !_tags.contains(_tagController.text)) {
       setState(() {
         _tags.add(_tagController.text);
         _tagController.clear();
@@ -66,9 +64,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   }
 
   void _removeTag(int index) {
-    setState(() {
-      _tags.removeAt(index);
-    });
+    setState(() => _tags.removeAt(index));
   }
 
   Future<void> _selectDate() async {
@@ -79,23 +75,43 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-      });
+      setState(() => _selectedDate = picked);
     }
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Создать заказ и отправить на сервер
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Заказ создан успешно!')),
-      );
-      
-      // Вызываем callback если он есть
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    final newOrder = OrderModel(
+      id: 'temp_${DateTime.now().millisecondsSinceEpoch}',
+      title: _titleController.text,
+      description: _descriptionController.text,
+      category: _selectedCategory,
+      price: '${_priceController.text} ₽',
+      date: _selectedDate != null
+          ? '${_selectedDate!.day} ${_getMonthName(_selectedDate!.month)}'
+          : 'Не указана',
+      location: _locationController.text,
+      time: _timeController.text,
+      tags: _tags.map((t) => OrderTagModel(text: t)).toList(),
+      clientId: 'current_user',
+      clientName: 'Вы (новый заказчик)',
+      clientPhone: 'Не указан',
+    );
+
+    try {
+      await ref.read(ordersProvider.notifier).addOrder(newOrder);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Заказ создан успешно!')),
+        );
+      }
+
       widget.onOrderCreated?.call();
-      
-      // Очищаем форму
+
       _titleController.clear();
       _descriptionController.clear();
       _priceController.clear();
@@ -105,8 +121,16 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       setState(() {
         _tags.clear();
         _selectedDate = null;
-        _selectedCategory = 'Звукорежиссёр';
+        _selectedCategory = AppConstants.orderCategories.first;
       });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -114,13 +138,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0A0A0A),
-        elevation: 0,
-        title: const Text(
-          'Создать заказ',
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
-        ),
-        centerTitle: true,
+        title: const Text('Создать заказ'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -129,107 +147,62 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Название заказа
-              _buildLabel('Название заказа'),
-              const SizedBox(height: 8),
-              TextFormField(
+              AppTextField(
                 controller: _titleController,
-                style: const TextStyle(color: Colors.white),
-                decoration: _buildInputDecoration('FOH-инженер, фестиваль'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Введите название заказа';
-                  }
-                  return null;
-                },
+                label: 'Название заказа',
+                hintText: 'FOH-инженер, фестиваль',
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Введите название заказа' : null,
               ),
               const SizedBox(height: 24),
-
-              // Описание
-              _buildLabel('Описание'),
-              const SizedBox(height: 8),
-              TextFormField(
+              AppTextField(
                 controller: _descriptionController,
-                style: const TextStyle(color: Colors.white),
+                label: 'Описание',
+                hintText: 'Описание работ...',
                 minLines: 4,
                 maxLines: 6,
-                decoration: _buildInputDecoration('Описание работ...'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Введите описание';
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Введите описание' : null,
+              ),
+              const SizedBox(height: 24),
+              AppDropdown<String>(
+                label: 'Категория',
+                value: _selectedCategory,
+                items: AppConstants.orderCategories,
+                onChanged: (value) {
+                  if (value != null) {
+                    setState(() => _selectedCategory = value);
                   }
-                  return null;
                 },
               ),
               const SizedBox(height: 24),
-
-              // Категория
-              _buildLabel('Категория'),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1C1C1E),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.white24),
-                ),
-                child: DropdownButton<String>(
-                  value: _selectedCategory,
-                  isExpanded: true,
-                  underline: const SizedBox(),
-                  dropdownColor: const Color(0xFF2C2C2E),
-                  items: _categories.map((cat) {
-                    return DropdownMenuItem(
-                      value: cat,
-                      child: Text(
-                        cat,
-                        style: const TextStyle(color: Colors.white70),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() => _selectedCategory = value);
-                    }
-                  },
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Цена
-              _buildLabel('Бюджет (₽)'),
-              const SizedBox(height: 8),
-              TextFormField(
+              AppTextField(
                 controller: _priceController,
-                style: const TextStyle(color: Colors.white),
+                label: 'Бюджет (₽)',
+                hintText: '25 000',
                 keyboardType: TextInputType.number,
-                decoration: _buildInputDecoration('25 000'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Введите бюджет';
-                  }
-                  return null;
-                },
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Введите бюджет' : null,
               ),
               const SizedBox(height: 24),
-
-              // Дата
               _buildLabel('Дата'),
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: _selectDate,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1C1C1E),
+                    color: AppTheme.surface,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white24),
+                    border: Border.all(color: AppTheme.textMuted),
                   ),
                   child: Row(
                     children: [
                       const Icon(Icons.calendar_today,
-                          size: 18, color: Colors.white54),
+                          size: 18, color: AppTheme.textMuted),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -238,8 +211,8 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                               : 'Выберите дату',
                           style: TextStyle(
                             color: _selectedDate != null
-                                ? Colors.white70
-                                : Colors.white54,
+                                ? AppTheme.textSecondary
+                                : AppTheme.textMuted,
                           ),
                         ),
                       ),
@@ -248,49 +221,30 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Локация
-              _buildLabel('Местоположение'),
-              const SizedBox(height: 8),
-              TextFormField(
+              AppTextField(
                 controller: _locationController,
-                style: const TextStyle(color: Colors.white),
-                decoration: _buildInputDecoration('Москва'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Введите местоположение';
-                  }
-                  return null;
-                },
+                label: 'Местоположение',
+                hintText: 'Москва',
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Введите местоположение' : null,
               ),
               const SizedBox(height: 24),
-
-              // Время
-              _buildLabel('Время (часы или дни)'),
-              const SizedBox(height: 8),
-              TextFormField(
+              AppTextField(
                 controller: _timeController,
-                style: const TextStyle(color: Colors.white),
-                decoration: _buildInputDecoration('12:00–02:00 или 3 дня'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Введите время';
-                  }
-                  return null;
-                },
+                label: 'Время (часы или дни)',
+                hintText: '12:00–02:00 или 3 дня',
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Введите время' : null,
               ),
               const SizedBox(height: 24),
-
-              // Теги
               _buildLabel('Требования / Теги'),
               const SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
-                    child: TextFormField(
+                    child: AppTextField(
                       controller: _tagController,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: _buildInputDecoration('Напр: DiGiCo SD5'),
+                      hintText: 'Напр: DiGiCo SD5',
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -299,7 +253,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: AppTheme.primary,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Icon(Icons.add, color: Colors.white),
@@ -313,62 +267,28 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                   spacing: 8,
                   runSpacing: 8,
                   children: _tags.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    String tag = entry.value;
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.blue.withOpacity(0.3)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            tag,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () => _removeTag(index),
-                            child: const Icon(
-                              Icons.close,
-                              size: 16,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ],
-                      ),
+                    return AppTag(
+                      text: entry.value,
+                      style: TagStyle.normal,
+                      onRemove: () => _removeTag(entry.key),
                     );
                   }).toList(),
                 ),
               const SizedBox(height: 32),
-
-              // Кнопка отправки
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text(
-                    'Создать заказ',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+                  onPressed: _isLoading ? null : _submitForm,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text('Создать заказ'),
                 ),
               ),
               const SizedBox(height: 32),
@@ -385,49 +305,15 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
       style: const TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.w500,
-        color: Colors.white,
+        color: AppTheme.textPrimary,
       ),
-    );
-  }
-
-  InputDecoration _buildInputDecoration(String hint) {
-    return InputDecoration(
-      hintText: hint,
-      hintStyle: const TextStyle(color: Colors.white54),
-      enabledBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.white24),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.blue),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.red),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.red),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
     );
   }
 
   String _getMonthName(int month) {
     const months = [
-      'янв',
-      'фев',
-      'мар',
-      'апр',
-      'май',
-      'июн',
-      'июл',
-      'авг',
-      'сен',
-      'окт',
-      'ноя',
-      'дек'
+      'янв', 'фев', 'мар', 'апр', 'май', 'июн',
+      'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'
     ];
     return months[month - 1];
   }
