@@ -52,9 +52,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
 final storageServiceProvider = Provider((ref) => StorageService());
 
-final authServiceProvider = Provider((ref) async {
+final authServiceProvider = Provider<AuthService>((ref) {
   final service = AuthService();
-  await service.init();
+  service.init(); // fire-and-forget, init is fast
   return service;
 });
 

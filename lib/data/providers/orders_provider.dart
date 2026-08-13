@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/order_model.dart';
 import '../services/order_service.dart';
-import '../core/utils/api_error_handler.dart';
+import '../../core/utils/api_error_handler.dart';
 
 /// Order state managed by Riverpod.
 class OrdersNotifier extends StateNotifier<AsyncValue<List<OrderModel>>> {
