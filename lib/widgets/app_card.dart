@@ -12,13 +12,14 @@ class AppCard extends StatelessWidget {
     required this.child,
     this.onTap,
     this.padding = const EdgeInsets.all(16),
-    this.margin = const EdgeInsets.only(bottom: 12),
+    this.margin = EdgeInsets.zero,
   });
 
   @override
   Widget build(BuildContext context) {
     final card = Card(
       margin: margin,
+      clipBehavior: Clip.antiAlias,
       child: Padding(padding: padding, child: child),
     );
 

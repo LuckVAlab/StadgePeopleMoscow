@@ -4,14 +4,13 @@ part 'user_model.freezed.dart';
 part 'user_model.g.dart';
 
 @freezed
-class UserModel with _$UserModel {
+sealed class UserModel with _$UserModel {
   const factory UserModel({
     required String id,
     required String name,
     required String email,
     required String phoneNumber,
     required String specialty,
-    required String specialties,
     @Default(0.0) double rating,
     @Default(0) int reviewsCount,
     @Default([]) List<String> equipment,

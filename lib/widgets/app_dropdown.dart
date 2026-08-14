@@ -39,24 +39,36 @@ class AppDropdown<T> extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: AppTheme.textMuted),
           ),
-          child: DropdownButton<T>(
-            value: value,
-            isExpanded: true,
-            underline: const SizedBox(),
-            dropdownColor: AppTheme.surfaceLight,
-            icon: const Icon(Icons.arrow_drop_down, color: AppTheme.textMuted),
-            items: items.map((item) {
-              return DropdownMenuItem<T>(
-                value: item,
-                child: Text(
-                  item.toString(),
-                  style: const TextStyle(color: AppTheme.textSecondary),
+          child: items.isEmpty
+              ? const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  child: Text(
+                    'Нет доступных вариантов',
+                    style: TextStyle(
+                      color: AppTheme.textDisabled,
+                      fontSize: 14,
+                    ),
+                  ),
+                )
+              : DropdownButton<T>(
+                  value: value,
+                  isExpanded: true,
+                  underline: const SizedBox(),
+                  dropdownColor: AppTheme.surfaceLight,
+                  icon: const Icon(Icons.arrow_drop_down,
+                      color: AppTheme.textMuted),
+                  items: items.map((item) {
+                    return DropdownMenuItem<T>(
+                      value: item,
+                      child: Text(
+                        item.toString(),
+                        style: const TextStyle(color: AppTheme.textSecondary),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: onChanged,
+                  style: const TextStyle(color: AppTheme.textPrimary),
                 ),
-              );
-            }).toList(),
-            onChanged: onChanged,
-            style: const TextStyle(color: AppTheme.textPrimary),
-          ),
         ),
       ],
     );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme/app_theme.dart';
+import '../core/utils/api_error_handler.dart';
+import '../data/providers/auth_provider.dart';
 import '../widgets/app_tag.dart';
 import '../widgets/app_card.dart';
 
@@ -13,45 +15,32 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   bool _isEditMode = false;
+  bool _isSaving = false;
 
   late final TextEditingController _nameController;
   late final TextEditingController _specialtyController;
 
-  final List<String> _gearList = [
-    'DiGiCo SD10',
-    'Yamaha QL5',
-    'Sennheiser IEM',
-    'L-Acoustics Kara',
-    'Shure Axient',
-  ];
-
-  final List<String> _skillsList = [
-    'Звуковой баланс',
-    'Работа с мониторами',
-    'Миксирование вживую',
-    'Работа с DiGiCo',
-  ];
-
-  String _userName = 'Алексей Петров';
-  String _userSpecialty = 'Звукорежиссёр • FOH / Мониторы';
-
-  // day number -> status (null=normal, true=available, false=busy)
-  final Map<int, bool?> _calendar = const {
-    13: false,
-    14: false,
-    16: true,
-    19: false,
-    20: false,
-    21: false,
-    23: true,
-    26: false,
-  };
+  // Local mutable lists that start from currentUser data
+  late List<String> _gearList;
+  late List<String> _skillsList;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: _userName);
-    _specialtyController = TextEditingController(text: _userSpecialty);
+    _refreshFromProvider();
+  }
+
+  /// Re-sync local state from the auth provider when the user changes.
+  void _refreshFromProvider() {
+    final currentUser = ref.read(authProvider.notifier).currentUser;
+    _nameController = TextEditingController(
+      text: currentUser?.name ?? '',
+    );
+    _specialtyController = TextEditingController(
+      text: currentUser?.specialty ?? '',
+    );
+    _gearList = List<String>.from(currentUser?.equipment ?? []);
+    _skillsList = List<String>.from(currentUser?.skills ?? []);
   }
 
   @override
@@ -112,8 +101,47 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
+  Future<void> _saveProfile() async {
+    final currentUser = ref.read(authProvider.notifier).currentUser;
+    if (currentUser == null) return;
+
+    setState(() => _isSaving = true);
+
+    try {
+      final updated = currentUser.copyWith(
+        name: _nameController.text,
+        specialty: _specialtyController.text,
+        equipment: _gearList,
+        skills: _skillsList,
+      );
+
+      await ref.read(authProvider.notifier).updateProfile(updated);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Профиль обновлен')),
+        );
+        setState(() {
+          _isEditMode = false;
+          _isSaving = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        final message =
+            e is ApiErrorInfo ? e.message : 'Ошибка обновления профиля';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+      setState(() => _isSaving = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final currentUser = ref.watch(authProvider.notifier).currentUser;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Профиль'),
@@ -124,26 +152,25 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               child: GestureDetector(
                 onTap: () {
                   if (_isEditMode) {
-                    setState(() {
-                      _userName = _nameController.text;
-                      _userSpecialty = _specialtyController.text;
-                      _isEditMode = false;
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Профиль обновлен')),
-                    );
+                    _saveProfile();
                   } else {
                     setState(() => _isEditMode = true);
                   }
                 },
-                child: Text(
-                  _isEditMode ? 'Готово' : 'Редакт.',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.primary,
-                  ),
-                ),
+                child: _isSaving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(
+                        _isEditMode ? 'Готово' : 'Редакт.',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.primary,
+                        ),
+                      ),
               ),
             ),
           ),
@@ -171,9 +198,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(height: 12),
             // Name
             if (!_isEditMode)
-              Text(_userName,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w500))
+              Text(
+                currentUser?.name ?? '',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              )
             else
               TextField(
                 controller: _nameController,
@@ -193,7 +222,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             const SizedBox(height: 4),
             // Specialty
             if (!_isEditMode)
-              Text(_userSpecialty, style: AppTheme.caption)
+              Text(
+                currentUser?.specialty ?? '',
+                style: AppTheme.caption,
+              )
             else
               TextField(
                 controller: _specialtyController,
@@ -210,23 +242,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               ),
             const SizedBox(height: 8),
-            // Rating
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ...List.generate(
-                  5,
-                  (_) => const Icon(Icons.star,
-                      size: 16, color: AppTheme.warning),
-                ),
-                const SizedBox(width: 6),
-                const Text('4.9',
-                    style: TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w500)),
-                const SizedBox(width: 4),
-                const Text('(23 отзыва)', style: AppTheme.caption),
-              ],
-            ),
+            // Rating — from currentUser data
+            if (currentUser != null && currentUser.reviewsCount > 0)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ...List.generate(
+                    5,
+                    (_) => const Icon(Icons.star,
+                        size: 16, color: AppTheme.warning),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    currentUser.rating.toStringAsFixed(1),
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '(${currentUser.reviewsCount} отзывов)',
+                    style: AppTheme.caption,
+                  ),
+                ],
+              ),
             const SizedBox(height: 24),
             // Gear
             _buildSectionTitle('Моё оборудование'),
@@ -332,10 +370,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // Calendar
+            // Calendar — dynamic for current month, uses AuthResponse.calendar
             _buildSectionTitle('Календарь занятости'),
             const SizedBox(height: 12),
-            _buildCalendar(),
+            _buildCalendar(currentUser?.calendar),
             const SizedBox(height: 12),
             const Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -346,16 +384,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ],
             ),
             const SizedBox(height: 24),
-            // Subscription
+            // Subscription — from currentUser data
             _buildSectionTitle('Подписка'),
             const SizedBox(height: 12),
-            const AppCard(
-              margin: EdgeInsets.zero,
-              child: Text(
-                'EventOS Pro — до 15 сентября',
-                style: AppTheme.body,
+            if (currentUser != null)
+              AppCard(
+                margin: EdgeInsets.zero,
+                child: Text(
+                  currentUser.subscription == 'Free'
+                      ? 'Бесплатная подписка'
+                      : currentUser.subscription,
+                  style: AppTheme.body,
+                ),
+              )
+            else
+              const AppCard(
+                margin: EdgeInsets.zero,
+                child: Text(
+                  'Бесплатная подписка',
+                  style: AppTheme.body,
+                ),
               ),
-            ),
             const SizedBox(height: 32),
           ],
         ),
@@ -373,7 +422,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     );
   }
 
-  Widget _buildCalendar() {
+  Widget _buildCalendar(Map<int, bool?>? calendar) {
     final days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     final currentDate = DateTime.now();
     final firstDayOfMonth = DateTime(currentDate.year, currentDate.month, 1);
@@ -429,7 +478,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             final day = calendarDays[index];
             if (day == null) return Container();
 
-            final status = _calendar[day];
+            // Use server calendar data if available, otherwise no status
+            final status = calendar?[day];
             final (bgColor, textColor) = switch (status) {
               true => (
                   AppTheme.success.withOpacity(0.15),
@@ -468,8 +518,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   String _getMonthName(int month) {
     const months = [
-      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+      'Январь',
+      'Февраль',
+      'Март',
+      'Апрель',
+      'Май',
+      'Июнь',
+      'Июль',
+      'Август',
+      'Сентябрь',
+      'Октябрь',
+      'Ноябрь',
+      'Декабрь'
     ];
     return months[month - 1];
   }

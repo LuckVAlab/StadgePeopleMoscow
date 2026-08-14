@@ -2,14 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/theme/app_theme.dart';
+import '../core/utils/api_error_handler.dart';
 import '../data/models/order_model.dart';
+import '../data/models/auth_model.dart';
+import '../data/providers/auth_provider.dart';
+import '../data/providers/orders_provider.dart';
 import '../widgets/app_card.dart';
 import '../widgets/app_tag.dart';
 
 class OrderDetailsScreen extends ConsumerStatefulWidget {
-  final Map<String, dynamic> orderData;
+  final String orderId;
+  final OrderModel? order;
 
-  const OrderDetailsScreen({super.key, required this.orderData});
+  const OrderDetailsScreen({
+    super.key,
+    required this.orderId,
+    this.order,
+  });
 
   @override
   ConsumerState<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
@@ -17,21 +26,39 @@ class OrderDetailsScreen extends ConsumerStatefulWidget {
 
 class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
   bool _hasResponded = false;
+  bool _isResponding = false;
+  late final OrderModel _order;
+  late final String _orderId;
+  AuthResponse? _currentUser;
+  bool _hasData = false;
 
-  void _respondToOrder() {
-    setState(() => _hasResponded = !_hasResponded);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _hasResponded ? 'Вы откликнулись на заказ' : 'Отклик отменен',
-        ),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _orderId = widget.orderId;
+    _currentUser = ref.read(authProvider.notifier).currentUser;
+    if (widget.order == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) context.pop();
+      });
+      return;
+    }
+    _order = widget.order!;
+    _hasData = true;
   }
 
   @override
   Widget build(BuildContext context) {
-    final order = OrderModel.fromJson(widget.orderData);
+    if (!_hasData) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Детали заказа')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final authState = ref.watch(authProvider).value;
+    final specialistId =
+        authState == AuthStatus.authenticated ? _currentUser?.userId : null;
 
     return Scaffold(
       appBar: AppBar(
@@ -54,7 +81,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    order.title,
+                    _order.title,
                     style: AppTheme.title,
                   ),
                   const SizedBox(height: 8),
@@ -70,7 +97,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          order.category,
+                          _order.category,
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppTheme.primary,
@@ -79,7 +106,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        order.price,
+                        _order.price,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -97,16 +124,16 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildInfoSection('Основная информация', [
-                    ('Дата', order.date),
-                    ('Место', order.location),
-                    ('Время', order.time),
+                    ('Дата', _order.date),
+                    ('Место', _order.location),
+                    ('Время', _order.time),
                   ]),
                   const SizedBox(height: 24),
 
                   const Text('Описание', style: AppTheme.subtitle),
                   const SizedBox(height: 8),
                   Text(
-                    order.description,
+                    _order.description,
                     style: const TextStyle(
                       fontSize: 14,
                       color: AppTheme.textSecondary,
@@ -116,7 +143,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                   const SizedBox(height: 24),
 
                   // Tags / Requirements
-                  if (order.tags.isNotEmpty)
+                  if (_order.tags.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -125,7 +152,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: order.tags.map((tag) {
+                          children: _order.tags.map((tag) {
                             final style = tag.isUrgent
                                 ? TagStyle.urgent
                                 : TagStyle.normal;
@@ -140,12 +167,12 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                     ),
 
                   _buildInfoSection('О заказчике', [
-                    ('Имя', order.clientName),
-                    ('Телефон', order.clientPhone),
+                    ('Имя', _order.clientName),
+                    ('Телефон', _order.clientPhone),
                     (
                       'Рейтинг',
-                      order.clientRating != null
-                          ? '${order.clientRating} ⭐'
+                      _order.clientRating != null
+                          ? '${_order.clientRating} ⭐'
                           : 'Новый'
                     ),
                   ]),
@@ -155,7 +182,9 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _respondToOrder,
+                      onPressed: _isResponding || specialistId == null
+                          ? null
+                          : _respondToOrder,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _hasResponded
                             ? AppTheme.success.withOpacity(0.2)
@@ -166,16 +195,37 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                               : Colors.transparent,
                         ),
                       ),
-                      child: Text(
-                        _hasResponded ? '✓ Вы откликнулись' : 'Откликнуться',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: _hasResponded ? AppTheme.success : Colors.white,
-                        ),
-                      ),
+                      child: _isResponding
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              _hasResponded
+                                  ? '✓ Вы откликнулись'
+                                  : 'Откликнуться',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
+                  if (specialistId == null) ...[
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Войдите, чтобы откликнуться',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textMuted,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
 
                   SizedBox(
@@ -192,6 +242,44 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _respondToOrder() async {
+    final specialistId = _currentUser?.userId;
+
+    if (specialistId == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Необходимо войти в аккаунт')),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isResponding = true);
+
+    try {
+      await ref
+          .read(ordersProvider.notifier)
+          .respondToOrder(_orderId, specialistId);
+
+      setState(() => _hasResponded = true);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Вы откликнулись на заказ')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        final message = e is ApiErrorInfo ? e.message : 'Ошибка при отклике';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isResponding = false);
+    }
   }
 
   Widget _buildInfoSection(String title, List<(String, String)> items) {

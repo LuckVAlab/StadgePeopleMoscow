@@ -8,14 +8,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:stadge_people_moscow/main.dart';
 import 'package:stadge_people_moscow/screens/login_screen.dart';
-import 'package:stadge_people_moscow/screens/register_screen.dart';
 import 'package:stadge_people_moscow/screens/main_screen.dart';
 import 'package:stadge_people_moscow/data/providers/auth_provider.dart';
 import 'package:stadge_people_moscow/data/services/auth_service.dart';
 import 'package:stadge_people_moscow/data/models/auth_model.dart';
+
+// ─── Mock AuthService ───
+
+class _MockAuthService extends AuthService {
+  @override
+  Future<AuthResponse> login(LoginRequest request) async {
+    return AuthResponse(
+      token: 'mock_token',
+      userId: 'user_001',
+      name: 'Test User',
+      email: request.email,
+      role: 'specialist',
+    );
+  }
+
+  @override
+  Future<AuthResponse> register(RegisterRequest request) async {
+    return AuthResponse(
+      token: 'mock_token',
+      userId: 'user_002',
+      name: request.name,
+      email: request.email,
+      role: 'specialist',
+    );
+  }
+
+  @override
+  Future<void> logout() async {}
+
+  @override
+  Future<void> init() async {}
+
+  @override
+  String? restoreToken() => null;
+}
 
 void main() {
   // ─── Login Screen Tests ───
@@ -153,39 +186,4 @@ void main() {
 
         expect(find.byType(MainScreen), findsOneWidget);
       });
-
-  // ─── Mock AuthService ───
-
-  class _MockAuthService extends AuthService {
-    @override
-    Future<AuthResponse> login(LoginRequest request) async {
-      return AuthResponse(
-        token: 'mock_token',
-        userId: 'user_001',
-        name: 'Test User',
-        email: request.email,
-        role: 'specialist',
-      );
-    }
-
-    @override
-    Future<AuthResponse> register(RegisterRequest request) async {
-      return AuthResponse(
-        token: 'mock_token',
-        userId: 'user_002',
-        name: request.name,
-        email: request.email,
-        role: 'specialist',
-      );
-    }
-
-    @override
-    Future<void> logout() async {}
-
-    @override
-    Future<void> init() async {}
-
-    @override
-    String? restoreToken() => null;
-  }
 }

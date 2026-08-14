@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,198 +9,132 @@ part of 'order_model.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
-
-OrderModel _$OrderModelFromJson(Map<String, dynamic> json) {
-  return _OrderModel.fromJson(json);
-}
 
 /// @nodoc
 mixin _$OrderModel {
-  String get id => throw _privateConstructorUsedError;
-  String get title => throw _privateConstructorUsedError;
-  String get description => throw _privateConstructorUsedError;
-  String get category => throw _privateConstructorUsedError;
-  String get price => throw _privateConstructorUsedError;
-  String get date => throw _privateConstructorUsedError;
-  String get location => throw _privateConstructorUsedError;
-  String get time => throw _privateConstructorUsedError;
-  List<OrderTagModel> get tags => throw _privateConstructorUsedError;
-  String get clientId => throw _privateConstructorUsedError;
-  String get clientName => throw _privateConstructorUsedError;
-  String get clientPhone => throw _privateConstructorUsedError;
-  double? get clientRating => throw _privateConstructorUsedError;
-  List<String> get applicants => throw _privateConstructorUsedError;
-  String? get selectedSpecialistId => throw _privateConstructorUsedError;
-  String get status => throw _privateConstructorUsedError;
-  DateTime? get createdAt => throw _privateConstructorUsedError;
-  DateTime? get updatedAt => throw _privateConstructorUsedError;
-  bool get isUrgent => throw _privateConstructorUsedError;
+  String get id;
+  String get title;
+  String get description;
+  String get category;
 
-  /// Serializes this OrderModel to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+  /// Raw price string for display (e.g. "25 000 ₽").
+  String get price;
+
+  /// Price in smallest currency unit for sorting/comparison.
+  /// Defaults to 0 if the backend omits it.
+  int? get priceCents;
+
+  /// Raw date string for display (e.g. "15 авг").
+  String get date;
+
+  /// Parsed date for sorting/filtering.
+  DateTime? get orderDate;
+  String get location;
+  String get time;
+  List<OrderTagModel> get tags;
+  String get clientId;
+  String get clientName;
+  String get clientPhone;
+  double? get clientRating;
+  List<String> get applicants;
+  String? get selectedSpecialistId;
+  String get status;
+  DateTime? get createdAt;
+  DateTime? get updatedAt;
+  bool get isUrgent;
 
   /// Create a copy of OrderModel
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $OrderModelCopyWith<OrderModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $OrderModelCopyWith<$Res> {
-  factory $OrderModelCopyWith(
-          OrderModel value, $Res Function(OrderModel) then) =
-      _$OrderModelCopyWithImpl<$Res, OrderModel>;
-  @useResult
-  $Res call(
-      {String id,
-      String title,
-      String description,
-      String category,
-      String price,
-      String date,
-      String location,
-      String time,
-      List<OrderTagModel> tags,
-      String clientId,
-      String clientName,
-      String clientPhone,
-      double? clientRating,
-      List<String> applicants,
-      String? selectedSpecialistId,
-      String status,
-      DateTime? createdAt,
-      DateTime? updatedAt,
-      bool isUrgent});
-}
-
-/// @nodoc
-class _$OrderModelCopyWithImpl<$Res, $Val extends OrderModel>
-    implements $OrderModelCopyWith<$Res> {
-  _$OrderModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of OrderModel
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $OrderModelCopyWith<OrderModel> get copyWith =>
+      _$OrderModelCopyWithImpl<OrderModel>(this as OrderModel, _$identity);
+
+  /// Serializes this OrderModel to a JSON map.
+  Map<String, dynamic> toJson();
+
   @override
-  $Res call({
-    Object? id = null,
-    Object? title = null,
-    Object? description = null,
-    Object? category = null,
-    Object? price = null,
-    Object? date = null,
-    Object? location = null,
-    Object? time = null,
-    Object? tags = null,
-    Object? clientId = null,
-    Object? clientName = null,
-    Object? clientPhone = null,
-    Object? clientRating = freezed,
-    Object? applicants = null,
-    Object? selectedSpecialistId = freezed,
-    Object? status = null,
-    Object? createdAt = freezed,
-    Object? updatedAt = freezed,
-    Object? isUrgent = null,
-  }) {
-    return _then(_value.copyWith(
-      id: null == id
-          ? _value.id
-          : id // ignore: cast_nullable_to_non_nullable
-              as String,
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      description: null == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
-              as String,
-      category: null == category
-          ? _value.category
-          : category // ignore: cast_nullable_to_non_nullable
-              as String,
-      price: null == price
-          ? _value.price
-          : price // ignore: cast_nullable_to_non_nullable
-              as String,
-      date: null == date
-          ? _value.date
-          : date // ignore: cast_nullable_to_non_nullable
-              as String,
-      location: null == location
-          ? _value.location
-          : location // ignore: cast_nullable_to_non_nullable
-              as String,
-      time: null == time
-          ? _value.time
-          : time // ignore: cast_nullable_to_non_nullable
-              as String,
-      tags: null == tags
-          ? _value.tags
-          : tags // ignore: cast_nullable_to_non_nullable
-              as List<OrderTagModel>,
-      clientId: null == clientId
-          ? _value.clientId
-          : clientId // ignore: cast_nullable_to_non_nullable
-              as String,
-      clientName: null == clientName
-          ? _value.clientName
-          : clientName // ignore: cast_nullable_to_non_nullable
-              as String,
-      clientPhone: null == clientPhone
-          ? _value.clientPhone
-          : clientPhone // ignore: cast_nullable_to_non_nullable
-              as String,
-      clientRating: freezed == clientRating
-          ? _value.clientRating
-          : clientRating // ignore: cast_nullable_to_non_nullable
-              as double?,
-      applicants: null == applicants
-          ? _value.applicants
-          : applicants // ignore: cast_nullable_to_non_nullable
-              as List<String>,
-      selectedSpecialistId: freezed == selectedSpecialistId
-          ? _value.selectedSpecialistId
-          : selectedSpecialistId // ignore: cast_nullable_to_non_nullable
-              as String?,
-      status: null == status
-          ? _value.status
-          : status // ignore: cast_nullable_to_non_nullable
-              as String,
-      createdAt: freezed == createdAt
-          ? _value.createdAt
-          : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      updatedAt: freezed == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      isUrgent: null == isUrgent
-          ? _value.isUrgent
-          : isUrgent // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is OrderModel &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.description, description) ||
+                other.description == description) &&
+            (identical(other.category, category) ||
+                other.category == category) &&
+            (identical(other.price, price) || other.price == price) &&
+            (identical(other.priceCents, priceCents) ||
+                other.priceCents == priceCents) &&
+            (identical(other.date, date) || other.date == date) &&
+            (identical(other.orderDate, orderDate) ||
+                other.orderDate == orderDate) &&
+            (identical(other.location, location) ||
+                other.location == location) &&
+            (identical(other.time, time) || other.time == time) &&
+            const DeepCollectionEquality().equals(other.tags, tags) &&
+            (identical(other.clientId, clientId) ||
+                other.clientId == clientId) &&
+            (identical(other.clientName, clientName) ||
+                other.clientName == clientName) &&
+            (identical(other.clientPhone, clientPhone) ||
+                other.clientPhone == clientPhone) &&
+            (identical(other.clientRating, clientRating) ||
+                other.clientRating == clientRating) &&
+            const DeepCollectionEquality()
+                .equals(other.applicants, applicants) &&
+            (identical(other.selectedSpecialistId, selectedSpecialistId) ||
+                other.selectedSpecialistId == selectedSpecialistId) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
+            (identical(other.updatedAt, updatedAt) ||
+                other.updatedAt == updatedAt) &&
+            (identical(other.isUrgent, isUrgent) ||
+                other.isUrgent == isUrgent));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        title,
+        description,
+        category,
+        price,
+        priceCents,
+        date,
+        orderDate,
+        location,
+        time,
+        const DeepCollectionEquality().hash(tags),
+        clientId,
+        clientName,
+        clientPhone,
+        clientRating,
+        const DeepCollectionEquality().hash(applicants),
+        selectedSpecialistId,
+        status,
+        createdAt,
+        updatedAt,
+        isUrgent
+      ]);
+
+  @override
+  String toString() {
+    return 'OrderModel(id: $id, title: $title, description: $description, category: $category, price: $price, priceCents: $priceCents, date: $date, orderDate: $orderDate, location: $location, time: $time, tags: $tags, clientId: $clientId, clientName: $clientName, clientPhone: $clientPhone, clientRating: $clientRating, applicants: $applicants, selectedSpecialistId: $selectedSpecialistId, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, isUrgent: $isUrgent)';
   }
 }
 
 /// @nodoc
-abstract class _$$OrderModelImplCopyWith<$Res>
-    implements $OrderModelCopyWith<$Res> {
-  factory _$$OrderModelImplCopyWith(
-          _$OrderModelImpl value, $Res Function(_$OrderModelImpl) then) =
-      __$$OrderModelImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $OrderModelCopyWith<$Res> {
+  factory $OrderModelCopyWith(
+          OrderModel value, $Res Function(OrderModel) _then) =
+      _$OrderModelCopyWithImpl;
   @useResult
   $Res call(
       {String id,
@@ -208,7 +142,9 @@ abstract class _$$OrderModelImplCopyWith<$Res>
       String description,
       String category,
       String price,
+      int? priceCents,
       String date,
+      DateTime? orderDate,
       String location,
       String time,
       List<OrderTagModel> tags,
@@ -225,12 +161,11 @@ abstract class _$$OrderModelImplCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$OrderModelImplCopyWithImpl<$Res>
-    extends _$OrderModelCopyWithImpl<$Res, _$OrderModelImpl>
-    implements _$$OrderModelImplCopyWith<$Res> {
-  __$$OrderModelImplCopyWithImpl(
-      _$OrderModelImpl _value, $Res Function(_$OrderModelImpl) _then)
-      : super(_value, _then);
+class _$OrderModelCopyWithImpl<$Res> implements $OrderModelCopyWith<$Res> {
+  _$OrderModelCopyWithImpl(this._self, this._then);
+
+  final OrderModel _self;
+  final $Res Function(OrderModel) _then;
 
   /// Create a copy of OrderModel
   /// with the given fields replaced by the non-null parameter values.
@@ -242,7 +177,9 @@ class __$$OrderModelImplCopyWithImpl<$Res>
     Object? description = null,
     Object? category = null,
     Object? price = null,
+    Object? priceCents = freezed,
     Object? date = null,
+    Object? orderDate = freezed,
     Object? location = null,
     Object? time = null,
     Object? tags = null,
@@ -257,97 +194,389 @@ class __$$OrderModelImplCopyWithImpl<$Res>
     Object? updatedAt = freezed,
     Object? isUrgent = null,
   }) {
-    return _then(_$OrderModelImpl(
+    return _then(_self.copyWith(
       id: null == id
-          ? _value.id
+          ? _self.id
           : id // ignore: cast_nullable_to_non_nullable
               as String,
       title: null == title
-          ? _value.title
+          ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
       description: null == description
-          ? _value.description
+          ? _self.description
           : description // ignore: cast_nullable_to_non_nullable
               as String,
       category: null == category
-          ? _value.category
+          ? _self.category
           : category // ignore: cast_nullable_to_non_nullable
               as String,
       price: null == price
-          ? _value.price
+          ? _self.price
           : price // ignore: cast_nullable_to_non_nullable
               as String,
+      priceCents: freezed == priceCents
+          ? _self.priceCents
+          : priceCents // ignore: cast_nullable_to_non_nullable
+              as int?,
       date: null == date
-          ? _value.date
+          ? _self.date
           : date // ignore: cast_nullable_to_non_nullable
               as String,
+      orderDate: freezed == orderDate
+          ? _self.orderDate
+          : orderDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       location: null == location
-          ? _value.location
+          ? _self.location
           : location // ignore: cast_nullable_to_non_nullable
               as String,
       time: null == time
-          ? _value.time
+          ? _self.time
           : time // ignore: cast_nullable_to_non_nullable
               as String,
       tags: null == tags
-          ? _value._tags
+          ? _self.tags
           : tags // ignore: cast_nullable_to_non_nullable
               as List<OrderTagModel>,
       clientId: null == clientId
-          ? _value.clientId
+          ? _self.clientId
           : clientId // ignore: cast_nullable_to_non_nullable
               as String,
       clientName: null == clientName
-          ? _value.clientName
+          ? _self.clientName
           : clientName // ignore: cast_nullable_to_non_nullable
               as String,
       clientPhone: null == clientPhone
-          ? _value.clientPhone
+          ? _self.clientPhone
           : clientPhone // ignore: cast_nullable_to_non_nullable
               as String,
       clientRating: freezed == clientRating
-          ? _value.clientRating
+          ? _self.clientRating
           : clientRating // ignore: cast_nullable_to_non_nullable
               as double?,
       applicants: null == applicants
-          ? _value._applicants
+          ? _self.applicants
           : applicants // ignore: cast_nullable_to_non_nullable
               as List<String>,
       selectedSpecialistId: freezed == selectedSpecialistId
-          ? _value.selectedSpecialistId
+          ? _self.selectedSpecialistId
           : selectedSpecialistId // ignore: cast_nullable_to_non_nullable
               as String?,
       status: null == status
-          ? _value.status
+          ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
               as String,
       createdAt: freezed == createdAt
-          ? _value.createdAt
+          ? _self.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       updatedAt: freezed == updatedAt
-          ? _value.updatedAt
+          ? _self.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
       isUrgent: null == isUrgent
-          ? _value.isUrgent
+          ? _self.isUrgent
           : isUrgent // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [OrderModel].
+extension OrderModelPatterns on OrderModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_OrderModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _OrderModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_OrderModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderModel():
+        return $default(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_OrderModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String title,
+            String description,
+            String category,
+            String price,
+            int? priceCents,
+            String date,
+            DateTime? orderDate,
+            String location,
+            String time,
+            List<OrderTagModel> tags,
+            String clientId,
+            String clientName,
+            String clientPhone,
+            double? clientRating,
+            List<String> applicants,
+            String? selectedSpecialistId,
+            String status,
+            DateTime? createdAt,
+            DateTime? updatedAt,
+            bool isUrgent)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _OrderModel() when $default != null:
+        return $default(
+            _that.id,
+            _that.title,
+            _that.description,
+            _that.category,
+            _that.price,
+            _that.priceCents,
+            _that.date,
+            _that.orderDate,
+            _that.location,
+            _that.time,
+            _that.tags,
+            _that.clientId,
+            _that.clientName,
+            _that.clientPhone,
+            _that.clientRating,
+            _that.applicants,
+            _that.selectedSpecialistId,
+            _that.status,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.isUrgent);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(
+            String id,
+            String title,
+            String description,
+            String category,
+            String price,
+            int? priceCents,
+            String date,
+            DateTime? orderDate,
+            String location,
+            String time,
+            List<OrderTagModel> tags,
+            String clientId,
+            String clientName,
+            String clientPhone,
+            double? clientRating,
+            List<String> applicants,
+            String? selectedSpecialistId,
+            String status,
+            DateTime? createdAt,
+            DateTime? updatedAt,
+            bool isUrgent)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderModel():
+        return $default(
+            _that.id,
+            _that.title,
+            _that.description,
+            _that.category,
+            _that.price,
+            _that.priceCents,
+            _that.date,
+            _that.orderDate,
+            _that.location,
+            _that.time,
+            _that.tags,
+            _that.clientId,
+            _that.clientName,
+            _that.clientPhone,
+            _that.clientRating,
+            _that.applicants,
+            _that.selectedSpecialistId,
+            _that.status,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.isUrgent);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(
+            String id,
+            String title,
+            String description,
+            String category,
+            String price,
+            int? priceCents,
+            String date,
+            DateTime? orderDate,
+            String location,
+            String time,
+            List<OrderTagModel> tags,
+            String clientId,
+            String clientName,
+            String clientPhone,
+            double? clientRating,
+            List<String> applicants,
+            String? selectedSpecialistId,
+            String status,
+            DateTime? createdAt,
+            DateTime? updatedAt,
+            bool isUrgent)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderModel() when $default != null:
+        return $default(
+            _that.id,
+            _that.title,
+            _that.description,
+            _that.category,
+            _that.price,
+            _that.priceCents,
+            _that.date,
+            _that.orderDate,
+            _that.location,
+            _that.time,
+            _that.tags,
+            _that.clientId,
+            _that.clientName,
+            _that.clientPhone,
+            _that.clientRating,
+            _that.applicants,
+            _that.selectedSpecialistId,
+            _that.status,
+            _that.createdAt,
+            _that.updatedAt,
+            _that.isUrgent);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 @JsonSerializable()
-class _$OrderModelImpl implements _OrderModel {
-  const _$OrderModelImpl(
+class _OrderModel implements OrderModel {
+  const _OrderModel(
       {required this.id,
       required this.title,
       required this.description,
       required this.category,
       required this.price,
+      this.priceCents,
       required this.date,
+      this.orderDate,
       required this.location,
       required this.time,
       final List<OrderTagModel> tags = const [],
@@ -363,9 +592,8 @@ class _$OrderModelImpl implements _OrderModel {
       this.isUrgent = false})
       : _tags = tags,
         _applicants = applicants;
-
-  factory _$OrderModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$OrderModelImplFromJson(json);
+  factory _OrderModel.fromJson(Map<String, dynamic> json) =>
+      _$OrderModelFromJson(json);
 
   @override
   final String id;
@@ -375,10 +603,23 @@ class _$OrderModelImpl implements _OrderModel {
   final String description;
   @override
   final String category;
+
+  /// Raw price string for display (e.g. "25 000 ₽").
   @override
   final String price;
+
+  /// Price in smallest currency unit for sorting/comparison.
+  /// Defaults to 0 if the backend omits it.
+  @override
+  final int? priceCents;
+
+  /// Raw date string for display (e.g. "15 авг").
   @override
   final String date;
+
+  /// Parsed date for sorting/filtering.
+  @override
+  final DateTime? orderDate;
   @override
   final String location;
   @override
@@ -422,16 +663,26 @@ class _$OrderModelImpl implements _OrderModel {
   @JsonKey()
   final bool isUrgent;
 
+  /// Create a copy of OrderModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'OrderModel(id: $id, title: $title, description: $description, category: $category, price: $price, date: $date, location: $location, time: $time, tags: $tags, clientId: $clientId, clientName: $clientName, clientPhone: $clientPhone, clientRating: $clientRating, applicants: $applicants, selectedSpecialistId: $selectedSpecialistId, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, isUrgent: $isUrgent)';
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$OrderModelCopyWith<_OrderModel> get copyWith =>
+      __$OrderModelCopyWithImpl<_OrderModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$OrderModelToJson(
+      this,
+    );
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$OrderModelImpl &&
+            other is _OrderModel &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
@@ -439,7 +690,11 @@ class _$OrderModelImpl implements _OrderModel {
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.price, price) || other.price == price) &&
+            (identical(other.priceCents, priceCents) ||
+                other.priceCents == priceCents) &&
             (identical(other.date, date) || other.date == date) &&
+            (identical(other.orderDate, orderDate) ||
+                other.orderDate == orderDate) &&
             (identical(other.location, location) ||
                 other.location == location) &&
             (identical(other.time, time) || other.time == time) &&
@@ -474,7 +729,9 @@ class _$OrderModelImpl implements _OrderModel {
         description,
         category,
         price,
+        priceCents,
         date,
+        orderDate,
         location,
         time,
         const DeepCollectionEquality().hash(_tags),
@@ -490,232 +747,189 @@ class _$OrderModelImpl implements _OrderModel {
         isUrgent
       ]);
 
-  /// Create a copy of OrderModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$OrderModelImplCopyWith<_$OrderModelImpl> get copyWith =>
-      __$$OrderModelImplCopyWithImpl<_$OrderModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$OrderModelImplToJson(
-      this,
-    );
-  }
-}
-
-abstract class _OrderModel implements OrderModel {
-  const factory _OrderModel(
-      {required final String id,
-      required final String title,
-      required final String description,
-      required final String category,
-      required final String price,
-      required final String date,
-      required final String location,
-      required final String time,
-      final List<OrderTagModel> tags,
-      required final String clientId,
-      required final String clientName,
-      required final String clientPhone,
-      final double? clientRating,
-      final List<String> applicants,
-      final String? selectedSpecialistId,
-      final String status,
-      final DateTime? createdAt,
-      final DateTime? updatedAt,
-      final bool isUrgent}) = _$OrderModelImpl;
-
-  factory _OrderModel.fromJson(Map<String, dynamic> json) =
-      _$OrderModelImpl.fromJson;
-
-  @override
-  String get id;
-  @override
-  String get title;
-  @override
-  String get description;
-  @override
-  String get category;
-  @override
-  String get price;
-  @override
-  String get date;
-  @override
-  String get location;
-  @override
-  String get time;
-  @override
-  List<OrderTagModel> get tags;
-  @override
-  String get clientId;
-  @override
-  String get clientName;
-  @override
-  String get clientPhone;
-  @override
-  double? get clientRating;
-  @override
-  List<String> get applicants;
-  @override
-  String? get selectedSpecialistId;
-  @override
-  String get status;
-  @override
-  DateTime? get createdAt;
-  @override
-  DateTime? get updatedAt;
-  @override
-  bool get isUrgent;
-
-  /// Create a copy of OrderModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$OrderModelImplCopyWith<_$OrderModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-OrderTagModel _$OrderTagModelFromJson(Map<String, dynamic> json) {
-  return _OrderTagModel.fromJson(json);
-}
-
-/// @nodoc
-mixin _$OrderTagModel {
-  String get text => throw _privateConstructorUsedError;
-  bool get isUrgent => throw _privateConstructorUsedError;
-  bool get isGreen => throw _privateConstructorUsedError;
-
-  /// Serializes this OrderTagModel to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-
-  /// Create a copy of OrderTagModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  $OrderTagModelCopyWith<OrderTagModel> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $OrderTagModelCopyWith<$Res> {
-  factory $OrderTagModelCopyWith(
-          OrderTagModel value, $Res Function(OrderTagModel) then) =
-      _$OrderTagModelCopyWithImpl<$Res, OrderTagModel>;
-  @useResult
-  $Res call({String text, bool isUrgent, bool isGreen});
-}
-
-/// @nodoc
-class _$OrderTagModelCopyWithImpl<$Res, $Val extends OrderTagModel>
-    implements $OrderTagModelCopyWith<$Res> {
-  _$OrderTagModelCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of OrderTagModel
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  @override
-  $Res call({
-    Object? text = null,
-    Object? isUrgent = null,
-    Object? isGreen = null,
-  }) {
-    return _then(_value.copyWith(
-      text: null == text
-          ? _value.text
-          : text // ignore: cast_nullable_to_non_nullable
-              as String,
-      isUrgent: null == isUrgent
-          ? _value.isUrgent
-          : isUrgent // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isGreen: null == isGreen
-          ? _value.isGreen
-          : isGreen // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ) as $Val);
+  String toString() {
+    return 'OrderModel(id: $id, title: $title, description: $description, category: $category, price: $price, priceCents: $priceCents, date: $date, orderDate: $orderDate, location: $location, time: $time, tags: $tags, clientId: $clientId, clientName: $clientName, clientPhone: $clientPhone, clientRating: $clientRating, applicants: $applicants, selectedSpecialistId: $selectedSpecialistId, status: $status, createdAt: $createdAt, updatedAt: $updatedAt, isUrgent: $isUrgent)';
   }
 }
 
 /// @nodoc
-abstract class _$$OrderTagModelImplCopyWith<$Res>
-    implements $OrderTagModelCopyWith<$Res> {
-  factory _$$OrderTagModelImplCopyWith(
-          _$OrderTagModelImpl value, $Res Function(_$OrderTagModelImpl) then) =
-      __$$OrderTagModelImplCopyWithImpl<$Res>;
+abstract mixin class _$OrderModelCopyWith<$Res>
+    implements $OrderModelCopyWith<$Res> {
+  factory _$OrderModelCopyWith(
+          _OrderModel value, $Res Function(_OrderModel) _then) =
+      __$OrderModelCopyWithImpl;
   @override
   @useResult
-  $Res call({String text, bool isUrgent, bool isGreen});
+  $Res call(
+      {String id,
+      String title,
+      String description,
+      String category,
+      String price,
+      int? priceCents,
+      String date,
+      DateTime? orderDate,
+      String location,
+      String time,
+      List<OrderTagModel> tags,
+      String clientId,
+      String clientName,
+      String clientPhone,
+      double? clientRating,
+      List<String> applicants,
+      String? selectedSpecialistId,
+      String status,
+      DateTime? createdAt,
+      DateTime? updatedAt,
+      bool isUrgent});
 }
 
 /// @nodoc
-class __$$OrderTagModelImplCopyWithImpl<$Res>
-    extends _$OrderTagModelCopyWithImpl<$Res, _$OrderTagModelImpl>
-    implements _$$OrderTagModelImplCopyWith<$Res> {
-  __$$OrderTagModelImplCopyWithImpl(
-      _$OrderTagModelImpl _value, $Res Function(_$OrderTagModelImpl) _then)
-      : super(_value, _then);
+class __$OrderModelCopyWithImpl<$Res> implements _$OrderModelCopyWith<$Res> {
+  __$OrderModelCopyWithImpl(this._self, this._then);
 
-  /// Create a copy of OrderTagModel
+  final _OrderModel _self;
+  final $Res Function(_OrderModel) _then;
+
+  /// Create a copy of OrderModel
   /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
   @override
+  @pragma('vm:prefer-inline')
   $Res call({
-    Object? text = null,
+    Object? id = null,
+    Object? title = null,
+    Object? description = null,
+    Object? category = null,
+    Object? price = null,
+    Object? priceCents = freezed,
+    Object? date = null,
+    Object? orderDate = freezed,
+    Object? location = null,
+    Object? time = null,
+    Object? tags = null,
+    Object? clientId = null,
+    Object? clientName = null,
+    Object? clientPhone = null,
+    Object? clientRating = freezed,
+    Object? applicants = null,
+    Object? selectedSpecialistId = freezed,
+    Object? status = null,
+    Object? createdAt = freezed,
+    Object? updatedAt = freezed,
     Object? isUrgent = null,
-    Object? isGreen = null,
   }) {
-    return _then(_$OrderTagModelImpl(
-      text: null == text
-          ? _value.text
-          : text // ignore: cast_nullable_to_non_nullable
+    return _then(_OrderModel(
+      id: null == id
+          ? _self.id
+          : id // ignore: cast_nullable_to_non_nullable
               as String,
+      title: null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      description: null == description
+          ? _self.description
+          : description // ignore: cast_nullable_to_non_nullable
+              as String,
+      category: null == category
+          ? _self.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as String,
+      price: null == price
+          ? _self.price
+          : price // ignore: cast_nullable_to_non_nullable
+              as String,
+      priceCents: freezed == priceCents
+          ? _self.priceCents
+          : priceCents // ignore: cast_nullable_to_non_nullable
+              as int?,
+      date: null == date
+          ? _self.date
+          : date // ignore: cast_nullable_to_non_nullable
+              as String,
+      orderDate: freezed == orderDate
+          ? _self.orderDate
+          : orderDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      location: null == location
+          ? _self.location
+          : location // ignore: cast_nullable_to_non_nullable
+              as String,
+      time: null == time
+          ? _self.time
+          : time // ignore: cast_nullable_to_non_nullable
+              as String,
+      tags: null == tags
+          ? _self._tags
+          : tags // ignore: cast_nullable_to_non_nullable
+              as List<OrderTagModel>,
+      clientId: null == clientId
+          ? _self.clientId
+          : clientId // ignore: cast_nullable_to_non_nullable
+              as String,
+      clientName: null == clientName
+          ? _self.clientName
+          : clientName // ignore: cast_nullable_to_non_nullable
+              as String,
+      clientPhone: null == clientPhone
+          ? _self.clientPhone
+          : clientPhone // ignore: cast_nullable_to_non_nullable
+              as String,
+      clientRating: freezed == clientRating
+          ? _self.clientRating
+          : clientRating // ignore: cast_nullable_to_non_nullable
+              as double?,
+      applicants: null == applicants
+          ? _self._applicants
+          : applicants // ignore: cast_nullable_to_non_nullable
+              as List<String>,
+      selectedSpecialistId: freezed == selectedSpecialistId
+          ? _self.selectedSpecialistId
+          : selectedSpecialistId // ignore: cast_nullable_to_non_nullable
+              as String?,
+      status: null == status
+          ? _self.status
+          : status // ignore: cast_nullable_to_non_nullable
+              as String,
+      createdAt: freezed == createdAt
+          ? _self.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      updatedAt: freezed == updatedAt
+          ? _self.updatedAt
+          : updatedAt // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
       isUrgent: null == isUrgent
-          ? _value.isUrgent
+          ? _self.isUrgent
           : isUrgent // ignore: cast_nullable_to_non_nullable
-              as bool,
-      isGreen: null == isGreen
-          ? _value.isGreen
-          : isGreen // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
 }
 
 /// @nodoc
-@JsonSerializable()
-class _$OrderTagModelImpl implements _OrderTagModel {
-  const _$OrderTagModelImpl(
-      {required this.text, this.isUrgent = false, this.isGreen = false});
+mixin _$OrderTagModel {
+  String get text;
+  bool get isUrgent;
+  bool get isGreen;
 
-  factory _$OrderTagModelImpl.fromJson(Map<String, dynamic> json) =>
-      _$$OrderTagModelImplFromJson(json);
+  /// Create a copy of OrderTagModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $OrderTagModelCopyWith<OrderTagModel> get copyWith =>
+      _$OrderTagModelCopyWithImpl<OrderTagModel>(
+          this as OrderTagModel, _$identity);
 
-  @override
-  final String text;
-  @override
-  @JsonKey()
-  final bool isUrgent;
-  @override
-  @JsonKey()
-  final bool isGreen;
-
-  @override
-  String toString() {
-    return 'OrderTagModel(text: $text, isUrgent: $isUrgent, isGreen: $isGreen)';
-  }
+  /// Serializes this OrderTagModel to a JSON map.
+  Map<String, dynamic> toJson();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$OrderTagModelImpl &&
+            other is OrderTagModel &&
             (identical(other.text, text) || other.text == text) &&
             (identical(other.isUrgent, isUrgent) ||
                 other.isUrgent == isUrgent) &&
@@ -726,42 +940,304 @@ class _$OrderTagModelImpl implements _OrderTagModel {
   @override
   int get hashCode => Object.hash(runtimeType, text, isUrgent, isGreen);
 
-  /// Create a copy of OrderTagModel
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  @pragma('vm:prefer-inline')
-  _$$OrderTagModelImplCopyWith<_$OrderTagModelImpl> get copyWith =>
-      __$$OrderTagModelImplCopyWithImpl<_$OrderTagModelImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$OrderTagModelImplToJson(
-      this,
-    );
+  String toString() {
+    return 'OrderTagModel(text: $text, isUrgent: $isUrgent, isGreen: $isGreen)';
   }
 }
 
-abstract class _OrderTagModel implements OrderTagModel {
-  const factory _OrderTagModel(
-      {required final String text,
-      final bool isUrgent,
-      final bool isGreen}) = _$OrderTagModelImpl;
+/// @nodoc
+abstract mixin class $OrderTagModelCopyWith<$Res> {
+  factory $OrderTagModelCopyWith(
+          OrderTagModel value, $Res Function(OrderTagModel) _then) =
+      _$OrderTagModelCopyWithImpl;
+  @useResult
+  $Res call({String text, bool isUrgent, bool isGreen});
+}
 
-  factory _OrderTagModel.fromJson(Map<String, dynamic> json) =
-      _$OrderTagModelImpl.fromJson;
+/// @nodoc
+class _$OrderTagModelCopyWithImpl<$Res>
+    implements $OrderTagModelCopyWith<$Res> {
+  _$OrderTagModelCopyWithImpl(this._self, this._then);
+
+  final OrderTagModel _self;
+  final $Res Function(OrderTagModel) _then;
+
+  /// Create a copy of OrderTagModel
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? text = null,
+    Object? isUrgent = null,
+    Object? isGreen = null,
+  }) {
+    return _then(_self.copyWith(
+      text: null == text
+          ? _self.text
+          : text // ignore: cast_nullable_to_non_nullable
+              as String,
+      isUrgent: null == isUrgent
+          ? _self.isUrgent
+          : isUrgent // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isGreen: null == isGreen
+          ? _self.isGreen
+          : isGreen // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+/// Adds pattern-matching-related methods to [OrderTagModel].
+extension OrderTagModelPatterns on OrderTagModel {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_OrderTagModel value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _OrderTagModel() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_OrderTagModel value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderTagModel():
+        return $default(_that);
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_OrderTagModel value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderTagModel() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String text, bool isUrgent, bool isGreen)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _OrderTagModel() when $default != null:
+        return $default(_that.text, _that.isUrgent, _that.isGreen);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String text, bool isUrgent, bool isGreen) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderTagModel():
+        return $default(_that.text, _that.isUrgent, _that.isGreen);
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String text, bool isUrgent, bool isGreen)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _OrderTagModel() when $default != null:
+        return $default(_that.text, _that.isUrgent, _that.isGreen);
+      case _:
+        return null;
+    }
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _OrderTagModel implements OrderTagModel {
+  const _OrderTagModel(
+      {required this.text, this.isUrgent = false, this.isGreen = false});
+  factory _OrderTagModel.fromJson(Map<String, dynamic> json) =>
+      _$OrderTagModelFromJson(json);
 
   @override
-  String get text;
+  final String text;
   @override
-  bool get isUrgent;
+  @JsonKey()
+  final bool isUrgent;
   @override
-  bool get isGreen;
+  @JsonKey()
+  final bool isGreen;
 
   /// Create a copy of OrderTagModel
   /// with the given fields replaced by the non-null parameter values.
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$OrderTagModelImplCopyWith<_$OrderTagModelImpl> get copyWith =>
-      throw _privateConstructorUsedError;
+  @pragma('vm:prefer-inline')
+  _$OrderTagModelCopyWith<_OrderTagModel> get copyWith =>
+      __$OrderTagModelCopyWithImpl<_OrderTagModel>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$OrderTagModelToJson(
+      this,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _OrderTagModel &&
+            (identical(other.text, text) || other.text == text) &&
+            (identical(other.isUrgent, isUrgent) ||
+                other.isUrgent == isUrgent) &&
+            (identical(other.isGreen, isGreen) || other.isGreen == isGreen));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode => Object.hash(runtimeType, text, isUrgent, isGreen);
+
+  @override
+  String toString() {
+    return 'OrderTagModel(text: $text, isUrgent: $isUrgent, isGreen: $isGreen)';
+  }
 }
+
+/// @nodoc
+abstract mixin class _$OrderTagModelCopyWith<$Res>
+    implements $OrderTagModelCopyWith<$Res> {
+  factory _$OrderTagModelCopyWith(
+          _OrderTagModel value, $Res Function(_OrderTagModel) _then) =
+      __$OrderTagModelCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String text, bool isUrgent, bool isGreen});
+}
+
+/// @nodoc
+class __$OrderTagModelCopyWithImpl<$Res>
+    implements _$OrderTagModelCopyWith<$Res> {
+  __$OrderTagModelCopyWithImpl(this._self, this._then);
+
+  final _OrderTagModel _self;
+  final $Res Function(_OrderTagModel) _then;
+
+  /// Create a copy of OrderTagModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? text = null,
+    Object? isUrgent = null,
+    Object? isGreen = null,
+  }) {
+    return _then(_OrderTagModel(
+      text: null == text
+          ? _self.text
+          : text // ignore: cast_nullable_to_non_nullable
+              as String,
+      isUrgent: null == isUrgent
+          ? _self.isUrgent
+          : isUrgent // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isGreen: null == isGreen
+          ? _self.isGreen
+          : isGreen // ignore: cast_nullable_to_non_nullable
+              as bool,
+    ));
+  }
+}
+
+// dart format on

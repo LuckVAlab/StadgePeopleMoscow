@@ -14,6 +14,8 @@ class AppTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final TextAlign textAlign;
   final void Function(String)? onChanged;
+  final TextInputAction? textInputAction;
+  final TextCapitalization textCapitalization;
 
   const AppTextField({
     super.key,
@@ -28,6 +30,8 @@ class AppTextField extends StatelessWidget {
     this.suffixIcon,
     this.textAlign = TextAlign.start,
     this.onChanged,
+    this.textInputAction,
+    this.textCapitalization = TextCapitalization.none,
   });
 
   @override
@@ -56,6 +60,8 @@ class AppTextField extends StatelessWidget {
           maxLines: maxLines,
           textAlign: textAlign,
           onChanged: onChanged,
+          textInputAction: textInputAction,
+          textCapitalization: textCapitalization,
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: const TextStyle(color: AppTheme.textMuted),

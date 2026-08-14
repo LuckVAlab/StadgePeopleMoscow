@@ -13,4 +13,5 @@ class ApiConstants {
   static const String orders = '/orders';
   static const String events = '/events';
   static const String profile = '/profile';
+  static const String logout = '/auth/logout';
 }

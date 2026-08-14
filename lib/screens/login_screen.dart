@@ -19,7 +19,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
   bool _obscurePassword = true;
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -38,29 +37,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _submitLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true);
+    final authNotifier = ref.read(authProvider.notifier);
 
     try {
-      await ref.read(authProvider.notifier).login(
-            LoginRequest(
-              email: _emailController.text,
-              password: _passwordController.text,
-            ),
-          );
-    } catch (e) {
-      if (mounted) {
-        final message = e is ApiErrorInfo ? e.message : 'Ошибка входа';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+      await authNotifier.login(
+        LoginRequest(
+          email: _emailController.text,
+          password: _passwordController.text,
+        ),
+      );
+
+      if (!mounted) return;
+
+      if (ref.read(authProvider).value == AuthStatus.authenticated) {
+        context.go('/home');
       }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+    } catch (e) {
+      if (!mounted) return;
+
+      final message = e is ApiErrorInfo
+          ? e.message
+          : 'Ошибка входа. Проверьте данные.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -97,7 +104,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Введите email';
                         }
-                        if (!value.contains('@')) {
+                        if (!RegExp(
+                          r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                        ).hasMatch(value)) {
                           return 'Введите корректный email';
                         }
                         return null;
@@ -150,8 +159,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _submitLogin,
-                        child: _isLoading
+                        onPressed: authState.isLoading ? null : _submitLogin,
+                        child: authState.isLoading
                             ? const SizedBox(
                                 height: 20,
                                 width: 20,

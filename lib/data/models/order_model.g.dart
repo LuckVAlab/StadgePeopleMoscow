@@ -6,14 +6,17 @@ part of 'order_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$OrderModelImpl _$$OrderModelImplFromJson(Map<String, dynamic> json) =>
-    _$OrderModelImpl(
+_OrderModel _$OrderModelFromJson(Map<String, dynamic> json) => _OrderModel(
       id: json['id'] as String,
       title: json['title'] as String,
       description: json['description'] as String,
       category: json['category'] as String,
       price: json['price'] as String,
+      priceCents: (json['priceCents'] as num?)?.toInt(),
       date: json['date'] as String,
+      orderDate: json['orderDate'] == null
+          ? null
+          : DateTime.parse(json['orderDate'] as String),
       location: json['location'] as String,
       time: json['time'] as String,
       tags: (json['tags'] as List<dynamic>?)
@@ -39,14 +42,16 @@ _$OrderModelImpl _$$OrderModelImplFromJson(Map<String, dynamic> json) =>
       isUrgent: json['isUrgent'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$$OrderModelImplToJson(_$OrderModelImpl instance) =>
+Map<String, dynamic> _$OrderModelToJson(_OrderModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
       'description': instance.description,
       'category': instance.category,
       'price': instance.price,
+      'priceCents': instance.priceCents,
       'date': instance.date,
+      'orderDate': instance.orderDate?.toIso8601String(),
       'location': instance.location,
       'time': instance.time,
       'tags': instance.tags,
@@ -62,14 +67,14 @@ Map<String, dynamic> _$$OrderModelImplToJson(_$OrderModelImpl instance) =>
       'isUrgent': instance.isUrgent,
     };
 
-_$OrderTagModelImpl _$$OrderTagModelImplFromJson(Map<String, dynamic> json) =>
-    _$OrderTagModelImpl(
+_OrderTagModel _$OrderTagModelFromJson(Map<String, dynamic> json) =>
+    _OrderTagModel(
       text: json['text'] as String,
       isUrgent: json['isUrgent'] as bool? ?? false,
       isGreen: json['isGreen'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$$OrderTagModelImplToJson(_$OrderTagModelImpl instance) =>
+Map<String, dynamic> _$OrderTagModelToJson(_OrderTagModel instance) =>
     <String, dynamic>{
       'text': instance.text,
       'isUrgent': instance.isUrgent,

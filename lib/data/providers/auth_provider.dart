@@ -1,16 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/auth_model.dart';
 import '../services/auth_service.dart';
 import '../services/storage_service.dart';
 
 /// Authentication state.
-enum AuthState { unauthenticated, authenticated }
+enum AuthStatus { initial, loading, authenticated, unauthenticated }
 
-class AuthNotifier extends StateNotifier<AuthState> {
+class AuthNotifier extends StateNotifier<AsyncValue<AuthStatus>> {
   final AuthService _authService;
   AuthResponse? _currentUser;
 
-  AuthNotifier(this._authService) : super(AuthState.unauthenticated) {
+  AuthNotifier(this._authService)
+      : super(const AsyncValue.data(AuthStatus.initial)) {
     _restoreSession();
   }
 
@@ -19,26 +22,58 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> _restoreSession() async {
     final token = _authService.restoreToken();
     if (token != null) {
-      state = AuthState.authenticated;
+      final userJson = AuthService.storage.getUser();
+      if (userJson != null) {
+        try {
+          _currentUser = AuthResponse.fromJson(
+            (jsonDecode(userJson) as Map<String, dynamic>),
+          );
+        } catch (_) {
+          // Corrupted user data, just restore auth state
+        }
+      }
+      state = const AsyncValue.data(AuthStatus.authenticated);
     }
   }
 
   Future<void> login(LoginRequest request) async {
+    state = const AsyncValue.loading();
     try {
       _currentUser = await _authService.login(request);
-      state = AuthState.authenticated;
-    } catch (e) {
-      state = AuthState.unauthenticated;
+      state = const AsyncValue.data(AuthStatus.authenticated);
+    } catch (e, stack) {
+      // Only reset to unauthenticated if we were previously initial/loading.
+      // Don't flip authenticated users to unauthenticated on transient errors.
+      final current = state.value;
+      if (current == AuthStatus.initial || current == AuthStatus.loading) {
+        state = AsyncValue.error(
+          e,
+          stack,
+        );
+      } else {
+        // Authenticated user encounters a transient error — keep current state
+        // and surface the error without breaking the UI.
+        state = AsyncValue.data(current!);
+      }
       rethrow;
     }
   }
 
   Future<void> register(RegisterRequest request) async {
+    state = const AsyncValue.loading();
     try {
       _currentUser = await _authService.register(request);
-      state = AuthState.authenticated;
-    } catch (e) {
-      state = AuthState.unauthenticated;
+      state = const AsyncValue.data(AuthStatus.authenticated);
+    } catch (e, stack) {
+      final current = state.value;
+      if (current == AuthStatus.initial || current == AuthStatus.loading) {
+        state = AsyncValue.error(
+          e,
+          stack,
+        );
+      } else {
+        state = AsyncValue.data(current!);
+      }
       rethrow;
     }
   }
@@ -46,18 +81,31 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> logout() async {
     await _authService.logout();
     _currentUser = null;
-    state = AuthState.unauthenticated;
+    state = const AsyncValue.data(AuthStatus.unauthenticated);
+  }
+
+  /// Update the current user profile on the server and persist locally.
+  Future<void> updateProfile(AuthResponse updates) async {
+    try {
+      final updated = await _authService.updateProfile(updates);
+      _currentUser = updated;
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack);
+      rethrow;
+    }
   }
 }
 
-final storageServiceProvider = Provider((ref) => StorageService());
+final storageServiceProvider = Provider<StorageService>((ref) {
+  return StorageService.instance;
+});
 
 final authServiceProvider = Provider<AuthService>((ref) {
   final service = AuthService();
-  service.init(); // fire-and-forget, init is fast
   return service;
 });
 
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
+final authProvider =
+    StateNotifierProvider<AuthNotifier, AsyncValue<AuthStatus>>(
   (ref) => AuthNotifier(ref.watch(authServiceProvider)),
 );

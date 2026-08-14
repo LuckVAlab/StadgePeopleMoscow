@@ -80,8 +80,27 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
     }
   }
 
+  int? _parsePrice(String raw) {
+    final cleaned = raw.replaceAll(RegExp(r'[^0-9]'), '');
+    if (cleaned.isEmpty) return null;
+    final value = int.tryParse(cleaned);
+    // Price must be non-negative and within reasonable bounds (10M rubles)
+    if (value == null || value < 0 || value > 1000000000) return null;
+    return value;
+  }
+
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final priceCents = _parsePrice(_priceController.text);
+    if (priceCents == null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Введите корректную сумму бюджета')),
+        );
+      }
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -91,9 +110,11 @@ class _CreateOrderScreenState extends ConsumerState<CreateOrderScreen> {
       description: _descriptionController.text,
       category: _selectedCategory,
       price: '${_priceController.text} ₽',
+      priceCents: priceCents,
       date: _selectedDate != null
           ? '${_selectedDate!.day} ${_getMonthName(_selectedDate!.month)}'
           : 'Не указана',
+      orderDate: _selectedDate,
       location: _locationController.text,
       time: _timeController.text,
       tags: _tags.map((t) => OrderTagModel(text: t)).toList(),

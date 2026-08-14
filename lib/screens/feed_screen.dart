@@ -20,6 +20,13 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   final List<String> _filters = ['Все', 'Звукорежиссёр', 'Бэклайнер', 'Техник'];
 
   @override
+  void initState() {
+    super.initState();
+    // Initial load — no category filter
+    ref.read(ordersProvider.notifier).loadOrders();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final role = ref.watch(roleProvider);
     final ordersAsync = ref.watch(ordersProvider);
@@ -80,8 +87,14 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                   child: ChoiceChip(
                     label: Text(filter),
                     selected: isActive,
-                    onSelected: (_) =>
-                        setState(() => _activeFilter = filter),
+                    onSelected: (_) async {
+                      setState(() => _activeFilter = filter);
+                      // Server-side category filter
+                      final category = filter == 'Все' ? null : filter;
+                      await ref
+                          .read(ordersProvider.notifier)
+                          .loadOrders(category: category);
+                    },
                     selectedColor: Colors.white,
                     labelStyle: TextStyle(
                       color: isActive ? Colors.black : Colors.white70,
@@ -110,11 +123,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                     style: const TextStyle(color: AppTheme.error)),
               ),
               data: (orders) {
-                final filteredOrders = _activeFilter == 'Все'
-                    ? orders
-                    : orders.where((o) => o.category == _activeFilter).toList();
-
-                if (filteredOrders.isEmpty) {
+                if (orders.isEmpty) {
                   return const Center(
                     child: Text(
                       'Нет заказов в этой категории',
@@ -125,9 +134,9 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: filteredOrders.length,
+                  itemCount: orders.length,
                   itemBuilder: (context, index) {
-                    return _OrderCard(order: filteredOrders[index]);
+                    return _OrderCard(order: orders[index]);
                   },
                 );
               },
@@ -182,7 +191,7 @@ class _OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppCard(
-      onTap: () => context.push('/order/${order.id}', extra: order.toJson()),
+      onTap: () => context.push('/order/${order.id}', extra: order),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -206,8 +215,7 @@ class _OrderCard extends StatelessWidget {
             children: [
               _MetaItem(icon: Icons.calendar_today, text: order.date),
               const SizedBox(width: 12),
-              _MetaItem(
-                  icon: Icons.location_on_outlined, text: order.location),
+              _MetaItem(icon: Icons.location_on_outlined, text: order.location),
               const SizedBox(width: 12),
               _MetaItem(icon: Icons.access_time, text: order.time),
             ],

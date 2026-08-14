@@ -26,7 +26,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _isLoading = false;
   String _selectedSpecialty = AppConstants.specialties.first;
 
   @override
@@ -59,32 +58,40 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       return;
     }
 
-    setState(() => _isLoading = true);
+    final authNotifier = ref.read(authProvider.notifier);
 
     try {
-      await ref.read(authProvider.notifier).register(
-            RegisterRequest(
-              name: _nameController.text,
-              email: _emailController.text,
-              phone: _phoneController.text,
-              password: _passwordController.text,
-              specialty: _selectedSpecialty,
-            ),
-          );
-    } catch (e) {
-      if (mounted) {
-        final message = e is ApiErrorInfo ? e.message : 'Ошибка регистрации';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message)),
-        );
+      await authNotifier.register(
+        RegisterRequest(
+          name: _nameController.text,
+          email: _emailController.text,
+          phone: _phoneController.text,
+          password: _passwordController.text,
+          specialty: _selectedSpecialty,
+        ),
+      );
+
+      if (!mounted) return;
+
+      if (ref.read(authProvider).value == AuthStatus.authenticated) {
+        context.go('/home');
       }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+    } catch (e) {
+      if (!mounted) return;
+
+      final message = e is ApiErrorInfo
+          ? e.message
+          : 'Ошибка регистрации.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -118,7 +125,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Введите email';
                       }
-                      if (!value.contains('@')) {
+                      if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value)) {
                         return 'Введите корректный email';
                       }
                       return null;
@@ -197,8 +204,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _submitRegister,
-                      child: _isLoading
+                      onPressed: authState.isLoading ? null : _submitRegister,
+                      child: authState.isLoading
                           ? const SizedBox(
                               height: 20,
                               width: 20,

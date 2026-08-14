@@ -6,14 +6,12 @@ part of 'user_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
-    _$UserModelImpl(
+_UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
       id: json['id'] as String,
       name: json['name'] as String,
       email: json['email'] as String,
       phoneNumber: json['phoneNumber'] as String,
       specialty: json['specialty'] as String,
-      specialties: json['specialties'] as String,
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       reviewsCount: (json['reviewsCount'] as num?)?.toInt() ?? 0,
       equipment: (json['equipment'] as List<dynamic>?)
@@ -39,14 +37,13 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
           : DateTime.parse(json['updatedAt'] as String),
     );
 
-Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
+Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'email': instance.email,
       'phoneNumber': instance.phoneNumber,
       'specialty': instance.specialty,
-      'specialties': instance.specialties,
       'rating': instance.rating,
       'reviewsCount': instance.reviewsCount,
       'equipment': instance.equipment,

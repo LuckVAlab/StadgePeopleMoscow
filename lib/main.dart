@@ -6,9 +6,10 @@ import 'data/services/storage_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await StorageService().init();
+  // Initialize storage before any provider is created
+  await StorageService.instance.init();
   runApp(
-    const ProviderScope(
+    ProviderScope(
       child: StadgePeopleMoscowApp(),
     ),
   );

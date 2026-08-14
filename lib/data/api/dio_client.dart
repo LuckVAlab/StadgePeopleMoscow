@@ -1,28 +1,68 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../core/constants/api_constants.dart';
 
 /// Interceptor that attaches Bearer token to every request.
+///
+/// Token access is synchronized to prevent race conditions between
+/// [onRequest] and [onError] callbacks on the event loop.
 class AuthInterceptor extends Interceptor {
   String? _token;
+  Future<void>? _lock;
 
-  void setToken(String token) => _token = token;
-  void clearToken() => _token = null;
-
-  @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    if (_token != null) {
-      options.headers['Authorization'] = 'Bearer $_token';
+  Future<void> _synchronized(Future<void> Function() fn) async {
+    if (_lock != null) await _lock;
+    var done = Completer<void>();
+    _lock = done.future.whenComplete(() {
+      if (_lock == done.future) _lock = null;
+    });
+    try {
+      await fn();
+    } finally {
+      done.complete();
     }
-    return handler.next(options);
+  }
+
+  void setToken(String token) {
+    _token = token;
+  }
+
+  void clearToken() {
+    _token = null;
+  }
+
+  String? _getToken() {
+    return _token;
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    // On 401, clear the stale token so the user can re-login
-    if (err.response?.statusCode == 401) {
-      _token = null;
-    }
-    return handler.next(err);
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    await _synchronized(() async {
+      final token = _getToken();
+      if (token != null) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
+    });
+    handler.next(options);
+  }
+
+  @override
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    await _synchronized(() async {
+      // On 401, clear the stale token so the user can re-login
+      if (err.response?.statusCode == 401) {
+        clearToken();
+      }
+    });
+    handler.next(err);
   }
 }
 
@@ -50,11 +90,14 @@ class DioClient {
     );
 
     _dio.interceptors.addAll([
-      LogInterceptor(
-        requestBody: true,
-        responseBody: true,
-        error: true,
-      ),
+      // LogInterceptor only in debug builds to avoid leaking sensitive data
+      // (tokens, emails, passwords) in production.
+      if (kDebugMode)
+        LogInterceptor(
+          requestBody: true,
+          responseBody: true,
+          error: true,
+        ),
       _authInterceptor,
     ]);
   }
