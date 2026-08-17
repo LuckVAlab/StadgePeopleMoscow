@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../core/theme/app_theme.dart';
-import '../core/utils/api_error_handler.dart';
-import '../data/models/order_model.dart';
-import '../data/models/auth_model.dart';
-import '../data/providers/auth_provider.dart';
-import '../data/providers/orders_provider.dart';
-import '../widgets/app_card.dart';
-import '../widgets/app_tag.dart';
+import 'package:stadge_people_moscow/core/theme/app_theme.dart';
+import 'package:stadge_people_moscow/core/utils/api_error_handler.dart';
+import 'package:stadge_people_moscow/data/models/auth_model.dart';
+import 'package:stadge_people_moscow/data/models/order_model.dart';
+import 'package:stadge_people_moscow/data/providers/auth_provider.dart';
+import 'package:stadge_people_moscow/data/providers/orders_provider.dart';
+import 'package:stadge_people_moscow/widgets/app_card.dart';
+import 'package:stadge_people_moscow/widgets/app_tag.dart';
 
 class OrderDetailsScreen extends ConsumerStatefulWidget {
   final String orderId;
@@ -93,7 +93,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppTheme.primary.withOpacity(0.15),
+                          color: AppTheme.primary.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -187,7 +187,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                           : _respondToOrder,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _hasResponded
-                            ? AppTheme.success.withOpacity(0.2)
+                            ? AppTheme.success.withValues(alpha: 0.2)
                             : AppTheme.primary,
                         side: BorderSide(
                           color: _hasResponded

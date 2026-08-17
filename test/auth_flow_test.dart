@@ -1,18 +1,18 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stadge_people_moscow/main.dart';
 import 'package:stadge_people_moscow/screens/login_screen.dart';
 import 'package:stadge_people_moscow/screens/main_screen.dart';
+import 'package:stadge_people_moscow/screens/register_screen.dart';
+import 'package:stadge_people_moscow/data/models/order_model.dart';
 import 'package:stadge_people_moscow/data/providers/auth_provider.dart';
+import 'package:stadge_people_moscow/data/providers/orders_provider.dart';
 import 'package:stadge_people_moscow/data/services/auth_service.dart';
+import 'package:stadge_people_moscow/data/services/order_service.dart';
+import 'package:stadge_people_moscow/data/services/storage_service.dart';
 import 'package:stadge_people_moscow/data/models/auth_model.dart';
 
 // ─── Mock AuthService ───
@@ -50,140 +50,192 @@ class _MockAuthService extends AuthService {
   String? restoreToken() => null;
 }
 
+// ─── Mock OrderService ───
+
+class _MockOrderService extends OrderService {
+  @override
+  Future<List<OrderModel>> getOrders({String? category}) async {
+    return [
+      OrderModel(
+        id: 'order_001',
+        title: 'FOH-инженер, фестиваль',
+        description: 'Работа на фестивале',
+        category: 'Звукорежиссёр',
+        price: '25 000 ₽',
+        priceCents: 2500000,
+        date: '15 авг',
+        location: 'Москва',
+        time: '12:00–02:00',
+        clientId: 'client_001',
+        clientName: 'EventPro LLC',
+        clientPhone: '+7 (999) 123-45-67',
+        status: 'open',
+      ),
+    ];
+  }
+}
+
 void main() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    await StorageService.instance.init();
+  });
+
+  Widget buildApp({bool mockOrders = true}) {
+    return ProviderScope(
+      overrides: [
+        authServiceProvider.overrideWith((ref) => _MockAuthService()),
+        if (mockOrders)
+          orderServiceProvider.overrideWith((ref) => _MockOrderService()),
+      ],
+      child: const StadgePeopleMoscowApp(),
+    );
+  }
+
+  // ─── App Launch Tests ───
+
+  testWidgets('App launches and shows main screen with feed',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      buildApp(),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MainScreen), findsOneWidget);
+    expect(find.text('Заказы'), findsOneWidget);
+  });
+
   // ─── Login Screen Tests ───
 
   testWidgets('Login screen renders correctly',
       (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const ProviderScope(child: StadgePeopleMoscowApp()),
-        );
+    await tester.pumpWidget(
+      buildApp(),
+    );
 
-        expect(find.text('Вход в аккаунт'), findsOneWidget);
-        expect(find.text('Введите ваши данные для входа'), findsOneWidget);
-        expect(find.byType(TextFormField), findsNWidgets(2));
-        expect(find.text('Вход'), findsOneWidget);
-        expect(find.text('Зарегистрируйтесь'), findsOneWidget);
-      });
+    // Navigate to login
+    final context = tester.element(find.byType(MainScreen));
+    GoRouter.of(context).go('/login');
+    await tester.pumpAndSettle();
 
-  testWidgets('Login screen shows loading on submit',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              authServiceProvider.overrideWith((ref) => _MockAuthService()),
-            ],
-            child: const StadgePeopleMoscowApp(),
-          ),
-        );
-
-        // Fill in the form
-        await tester.enterText(
-            find.byType(TextFormField).at(0), 'test@example.com');
-        await tester.enterText(
-            find.byType(TextFormField).at(1), 'password123');
-        await tester.tap(find.text('Вход'));
-        await tester.pump();
-
-        expect(find.byType(CircularProgressIndicator), findsOneWidget);
-      });
+    expect(find.text('Вход в аккаунт'), findsOneWidget);
+    expect(find.text('Введите ваши данные для входа'), findsOneWidget);
+    expect(find.byType(TextFormField), findsNWidgets(2));
+    expect(find.text('Вход'), findsOneWidget);
+    expect(find.text('Зарегистрируйтесь'), findsOneWidget);
+  });
 
   testWidgets('Login screen validates empty email',
       (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const ProviderScope(child: StadgePeopleMoscowApp()),
-        );
+    await tester.pumpWidget(
+      buildApp(),
+    );
 
-        await tester.enterText(
-            find.byType(TextFormField).at(1), 'password123');
-        await tester.tap(find.text('Вход'));
-        await tester.pump();
+    final context = tester.element(find.byType(MainScreen));
+    GoRouter.of(context).go('/login');
+    await tester.pumpAndSettle();
 
-        expect(
-            find.text('Введите email'), findsOneWidget);
-      });
+    await tester.enterText(
+        find.byType(TextFormField).at(1), 'password123');
+    await tester.tap(find.text('Вход'));
+    await tester.pump();
+
+    expect(find.text('Введите email'), findsOneWidget);
+  });
 
   testWidgets('Login screen validates empty password',
       (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const ProviderScope(child: StadgePeopleMoscowApp()),
-        );
+    await tester.pumpWidget(
+      buildApp(),
+    );
 
-        await tester.enterText(
-            find.byType(TextFormField).at(0), 'test@example.com');
-        await tester.tap(find.text('Вход'));
-        await tester.pump();
+    final context = tester.element(find.byType(MainScreen));
+    GoRouter.of(context).go('/login');
+    await tester.pumpAndSettle();
 
-        expect(
-            find.text('Введите пароль'), findsOneWidget);
-      });
+    await tester.enterText(
+        find.byType(TextFormField).at(0), 'test@example.com');
+    await tester.tap(find.text('Вход'));
+    await tester.pump();
+
+    expect(find.text('Введите пароль'), findsOneWidget);
+  });
+
+  testWidgets('Login screen shows loading on submit',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(
+      buildApp(),
+    );
+
+    // Navigate to login
+    final context = tester.element(find.byType(MainScreen));
+    GoRouter.of(context).go('/login');
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+        find.byType(TextFormField).at(0), 'test@example.com');
+    await tester.enterText(
+        find.byType(TextFormField).at(1), 'password123');
+    await tester.tap(find.text('Вход'));
+    await tester.pump();
+
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  });
 
   // ─── Register Screen Tests ───
 
   testWidgets('Register screen renders correctly',
       (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const ProviderScope(child: StadgePeopleMoscowApp()),
-        );
+    await tester.pumpWidget(
+      buildApp(),
+    );
 
-        await tester.tap(find.text('Зарегистрируйтесь'));
-        await tester.pumpAndSettle();
+    final context = tester.element(find.byType(MainScreen));
+    GoRouter.of(context).go('/register');
+    await tester.pumpAndSettle();
 
-        expect(find.text('Регистрация'), findsOneWidget);
-        expect(find.text('Войдите'), findsOneWidget);
-      });
+    expect(find.text('Регистрация'), findsOneWidget);
+    expect(find.text('Войдите'), findsOneWidget);
+  });
 
   testWidgets('Register screen validates empty name',
       (WidgetTester tester) async {
-        await tester.pumpWidget(
-          const ProviderScope(child: StadgePeopleMoscowApp()),
-        );
+    await tester.pumpWidget(
+      buildApp(),
+    );
 
-        await tester.tap(find.text('Зарегистрируйтесь'));
-        await tester.pumpAndSettle();
+    final context = tester.element(find.byType(MainScreen));
+    GoRouter.of(context).go('/register');
+    await tester.pumpAndSettle();
 
-        await tester.tap(find.text('Зарегистрироваться'));
-        await tester.pump();
+    await tester.ensureVisible(find.text('Зарегистрироваться'));
+    await tester.tap(find.text('Зарегистрироваться'));
+    await tester.pump();
 
-        expect(find.text('Введите имя'), findsOneWidget);
-      });
+    expect(find.text('Введите имя'), findsOneWidget);
+  });
 
   // ─── Router Tests ───
 
-  testWidgets('Router redirects unauthenticated user to login',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              authServiceProvider.overrideWith((ref) => _MockAuthService()),
-            ],
-            child: const StadgePeopleMoscowApp(),
-          ),
-        );
-
-        expect(find.byType(LoginScreen), findsOneWidget);
-        expect(find.byType(MainScreen), findsNothing);
-      });
-
   testWidgets('After login user is redirected to main screen',
       (WidgetTester tester) async {
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              authServiceProvider.overrideWith((ref) => _MockAuthService()),
-            ],
-            child: const StadgePeopleMoscowApp(),
-          ),
-        );
+    await tester.pumpWidget(
+      buildApp(),
+    );
 
-        // Fill login form
-        await tester.enterText(
-            find.byType(TextFormField).at(0), 'test@example.com');
-        await tester.enterText(
-            find.byType(TextFormField).at(1), 'password123');
-        await tester.tap(find.text('Вход'));
-        await tester.pumpAndSettle();
+    // Navigate to login
+    final context = tester.element(find.byType(MainScreen));
+    GoRouter.of(context).go('/login');
+    await tester.pumpAndSettle();
 
-        expect(find.byType(MainScreen), findsOneWidget);
-      });
+    // Fill login form
+    await tester.enterText(
+        find.byType(TextFormField).at(0), 'test@example.com');
+    await tester.enterText(
+        find.byType(TextFormField).at(1), 'password123');
+    await tester.tap(find.text('Вход'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MainScreen), findsOneWidget);
+  });
 }

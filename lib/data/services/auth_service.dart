@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import '../../core/constants/api_constants.dart';
-import '../../core/utils/api_error_handler.dart';
-import '../models/auth_model.dart';
-import '../api/dio_client.dart';
-import 'storage_service.dart';
+import 'package:stadge_people_moscow/core/constants/api_constants.dart';
+import 'package:stadge_people_moscow/core/utils/api_error_handler.dart';
+import 'package:stadge_people_moscow/data/api/dio_client.dart';
+import 'package:stadge_people_moscow/data/models/auth_model.dart';
+import 'package:stadge_people_moscow/data/services/storage_service.dart';
 
 /// Authentication API service.
 ///
@@ -18,7 +18,7 @@ class AuthService {
 
   // Set via --dart-define=USE_MOCK=true when building for development
   static const bool _useMock =
-      bool.fromEnvironment('USE_MOCK', defaultValue: true);
+      bool.fromEnvironment('USE_MOCK', defaultValue: false);
 
   static StorageService get storage => StorageService.instance;
 

@@ -4,14 +4,14 @@
 class ApiConstants {
   ApiConstants._();
 
-  static const String baseUrl = 'https://api.stadgepeople.moscow/v1';
+  // Local development backend (Express + SQLite).
+  // For production, replace with https://api.stadgepeople.moscow/v1
+  static const String baseUrl = 'http://localhost:8080/v1';
 
   // Endpoints
   static const String login = '/auth/login';
   static const String register = '/auth/register';
-  static const String users = '/users';
   static const String orders = '/orders';
-  static const String events = '/events';
   static const String profile = '/profile';
   static const String logout = '/auth/logout';
 }

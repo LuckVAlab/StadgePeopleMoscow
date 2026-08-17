@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/providers/role_provider.dart';
-import 'feed_screen.dart';
-import 'profile_screen.dart';
-import 'create_order_screen.dart';
+import 'package:stadge_people_moscow/data/providers/role_provider.dart';
+import 'package:stadge_people_moscow/screens/create_order_screen.dart';
+import 'package:stadge_people_moscow/screens/feed_screen.dart';
+import 'package:stadge_people_moscow/screens/profile_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});

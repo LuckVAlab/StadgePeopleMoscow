@@ -1,9 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/auth_model.dart';
-import '../services/auth_service.dart';
-import '../services/storage_service.dart';
+import 'package:stadge_people_moscow/data/models/auth_model.dart';
+import 'package:stadge_people_moscow/data/services/auth_service.dart';
 
 /// Authentication state.
 enum AuthStatus { initial, loading, authenticated, unauthenticated }
@@ -95,10 +94,6 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthStatus>> {
     }
   }
 }
-
-final storageServiceProvider = Provider<StorageService>((ref) {
-  return StorageService.instance;
-});
 
 final authServiceProvider = Provider<AuthService>((ref) {
   final service = AuthService();

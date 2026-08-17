@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
+import 'package:stadge_people_moscow/core/theme/app_theme.dart';
 
 enum TagStyle { normal, urgent, success }
 
@@ -20,14 +20,14 @@ class AppTag extends StatelessWidget {
   Widget build(BuildContext context) {
     final (bgColor, textColor, borderColor) = switch (style) {
       TagStyle.urgent => (
-          AppTheme.error.withOpacity(0.15),
+          AppTheme.error.withValues(alpha: 0.15),
           AppTheme.error,
-          AppTheme.error.withOpacity(0.3),
+          AppTheme.error.withValues(alpha: 0.3),
         ),
       TagStyle.success => (
-          AppTheme.success.withOpacity(0.15),
+          AppTheme.success.withValues(alpha: 0.15),
           AppTheme.success,
-          AppTheme.success.withOpacity(0.3),
+          AppTheme.success.withValues(alpha: 0.3),
         ),
       TagStyle.normal => (
           AppTheme.surfaceLight,

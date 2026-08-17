@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/theme/app_theme.dart';
-import '../core/utils/api_error_handler.dart';
-import '../data/providers/auth_provider.dart';
-import '../widgets/app_tag.dart';
-import '../widgets/app_card.dart';
+import 'package:stadge_people_moscow/core/theme/app_theme.dart';
+import 'package:stadge_people_moscow/core/utils/api_error_handler.dart';
+import 'package:stadge_people_moscow/data/providers/auth_provider.dart';
+import 'package:stadge_people_moscow/widgets/app_card.dart';
+import 'package:stadge_people_moscow/widgets/app_tag.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -482,11 +482,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             final status = calendar?[day];
             final (bgColor, textColor) = switch (status) {
               true => (
-                  AppTheme.success.withOpacity(0.15),
+                  AppTheme.success.withValues(alpha: 0.15),
                   AppTheme.success,
                 ),
               false => (
-                  AppTheme.error.withOpacity(0.15),
+                  AppTheme.error.withValues(alpha: 0.15),
                   AppTheme.error,
                 ),
               null => (

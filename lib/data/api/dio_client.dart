@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import '../../core/constants/api_constants.dart';
+import 'package:stadge_people_moscow/core/constants/api_constants.dart';
 
 /// Interceptor that attaches Bearer token to every request.
 ///

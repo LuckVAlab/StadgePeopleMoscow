@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/order_model.dart';
-import '../services/order_service.dart';
-import '../../core/utils/api_error_handler.dart';
+import 'package:stadge_people_moscow/core/utils/api_error_handler.dart';
+import 'package:stadge_people_moscow/data/models/order_model.dart';
+import 'package:stadge_people_moscow/data/services/order_service.dart';
 
 /// Order state managed by Riverpod.
 class OrdersNotifier extends StateNotifier<AsyncValue<List<OrderModel>>> {

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/theme/app_theme.dart';
-import '../core/utils/api_error_handler.dart';
-import '../core/constants/app_constants.dart';
-import '../data/models/order_model.dart';
-import '../data/providers/orders_provider.dart';
-import '../widgets/app_text_field.dart';
-import '../widgets/app_dropdown.dart';
-import '../widgets/app_tag.dart';
+import 'package:stadge_people_moscow/core/constants/app_constants.dart';
+import 'package:stadge_people_moscow/core/theme/app_theme.dart';
+import 'package:stadge_people_moscow/core/utils/api_error_handler.dart';
+import 'package:stadge_people_moscow/data/models/order_model.dart';
+import 'package:stadge_people_moscow/data/providers/orders_provider.dart';
+import 'package:stadge_people_moscow/widgets/app_dropdown.dart';
+import 'package:stadge_people_moscow/widgets/app_tag.dart';
+import 'package:stadge_people_moscow/widgets/app_text_field.dart';
 
 class CreateOrderScreen extends ConsumerStatefulWidget {
   final VoidCallback? onOrderCreated;

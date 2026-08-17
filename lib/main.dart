@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/theme/app_theme.dart';
-import 'core/router/app_router.dart';
-import 'data/services/storage_service.dart';
+import 'package:stadge_people_moscow/core/theme/app_theme.dart';
+import 'package:stadge_people_moscow/core/router/app_router.dart';
+import 'package:stadge_people_moscow/data/services/storage_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize storage before any provider is created
   await StorageService.instance.init();
   runApp(
-    ProviderScope(
+    const ProviderScope(
       child: StadgePeopleMoscowApp(),
     ),
   );

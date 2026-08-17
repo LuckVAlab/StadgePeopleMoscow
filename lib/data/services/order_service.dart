@@ -1,14 +1,14 @@
 import 'package:dio/dio.dart';
-import '../../core/constants/api_constants.dart';
-import '../../core/utils/api_error_handler.dart';
-import '../api/dio_client.dart';
-import '../models/order_model.dart';
+import 'package:stadge_people_moscow/core/constants/api_constants.dart';
+import 'package:stadge_people_moscow/core/utils/api_error_handler.dart';
+import 'package:stadge_people_moscow/data/api/dio_client.dart';
+import 'package:stadge_people_moscow/data/models/order_model.dart';
 
 /// Order API service.
 class OrderService {
   // Set via --dart-define=USE_MOCK=true when building for development
   static const bool _useMock =
-      bool.fromEnvironment('USE_MOCK', defaultValue: true);
+      bool.fromEnvironment('USE_MOCK', defaultValue: false);
 
   Future<List<OrderModel>> getOrders({String? category}) async {
     if (_useMock) return _mockGetOrders(category: category);

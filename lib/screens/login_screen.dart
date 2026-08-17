@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../core/theme/app_theme.dart';
-import '../core/utils/api_error_handler.dart';
-import '../data/models/auth_model.dart';
-import '../data/providers/auth_provider.dart';
-import '../widgets/app_text_field.dart';
+import 'package:stadge_people_moscow/core/theme/app_theme.dart';
+import 'package:stadge_people_moscow/core/utils/api_error_handler.dart';
+import 'package:stadge_people_moscow/data/models/auth_model.dart';
+import 'package:stadge_people_moscow/data/providers/auth_provider.dart';
+import 'package:stadge_people_moscow/widgets/app_text_field.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -71,7 +71,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          height: MediaQuery.of(context).size.height,
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+          ),
           color: AppTheme.background,
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(

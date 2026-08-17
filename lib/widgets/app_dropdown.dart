@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
+import 'package:stadge_people_moscow/core/theme/app_theme.dart';
 
 /// Styled dropdown button for consistent look.
 class AppDropdown<T> extends StatelessWidget {

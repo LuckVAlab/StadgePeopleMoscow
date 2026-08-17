@@ -7,14 +7,6 @@ import 'package:dio/dio.dart';
 class ApiErrorHandler {
   const ApiErrorHandler._();
 
-  /// Returns a user-friendly error message based on the exception.
-  static String userMessage(Object error) {
-    if (error is DioException) {
-      return _dioMessage(error);
-    }
-    return 'Произошла ошибка. Попробуйте позже.';
-  }
-
   /// Returns structured error info for the UI layer.
   static ApiErrorInfo info(Object error) {
     if (error is DioException) {

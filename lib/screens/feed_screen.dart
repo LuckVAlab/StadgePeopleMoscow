@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../core/theme/app_theme.dart';
-import '../data/providers/role_provider.dart';
-import '../data/providers/orders_provider.dart';
-import '../data/models/order_model.dart';
-import '../widgets/app_card.dart';
-import '../widgets/app_tag.dart';
+import 'package:stadge_people_moscow/core/theme/app_theme.dart';
+import 'package:stadge_people_moscow/data/models/order_model.dart';
+import 'package:stadge_people_moscow/data/providers/orders_provider.dart';
+import 'package:stadge_people_moscow/data/providers/role_provider.dart';
+import 'package:stadge_people_moscow/widgets/app_card.dart';
+import 'package:stadge_people_moscow/widgets/app_tag.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
