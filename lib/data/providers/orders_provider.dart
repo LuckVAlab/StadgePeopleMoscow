@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stadge_people_moscow/core/utils/api_error_handler.dart';
 import 'package:stadge_people_moscow/data/models/order_model.dart';
@@ -27,7 +28,11 @@ class OrdersNotifier extends StateNotifier<AsyncValue<List<OrderModel>>> {
 
   /// Actual order loading logic.
   Future<void> _doLoadOrders() async {
-    state = const AsyncValue.loading();
+    // Defer state update to the next frame to avoid modifying provider state
+    // during widget tree building (e.g. when called from initState).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      state = const AsyncValue.loading();
+    });
     try {
       final orders = await _orderService.getOrders(category: _currentCategory);
       state = AsyncValue.data(orders);
@@ -62,14 +67,18 @@ class OrdersNotifier extends StateNotifier<AsyncValue<List<OrderModel>>> {
     }
   }
 
-  Future<void> respondToOrder(String orderId, String specialistId) async {
+  /// Respond to an order and update it in the list in place.
+  /// Rethrows ApiErrorInfo so callers can distinguish success from failure.
+  Future<void> respondToOrder(OrderModel order, String specialistId) async {
     try {
-      final updatedOrder =
-          await _orderService.respondToOrder(orderId, specialistId);
+      final updatedOrder = await _orderService.respondToOrder(
+        order,
+        specialistId,
+      );
       final currentOrders = state.value;
       if (currentOrders != null) {
         final updatedOrders = currentOrders.map((o) {
-          return o.id == orderId ? updatedOrder : o;
+          return o.id == updatedOrder.id ? updatedOrder : o;
         }).toList();
         state = AsyncValue.data(updatedOrders);
       } else {
@@ -78,6 +87,7 @@ class OrdersNotifier extends StateNotifier<AsyncValue<List<OrderModel>>> {
     } catch (e, stack) {
       final message = e is ApiErrorInfo ? e.message : 'Ошибка отклика';
       state = AsyncValue.error(message, stack);
+      rethrow;
     }
   }
 }

@@ -4,9 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stadge_people_moscow/main.dart';
-import 'package:stadge_people_moscow/screens/login_screen.dart';
 import 'package:stadge_people_moscow/screens/main_screen.dart';
-import 'package:stadge_people_moscow/screens/register_screen.dart';
 import 'package:stadge_people_moscow/data/models/order_model.dart';
 import 'package:stadge_people_moscow/data/providers/auth_provider.dart';
 import 'package:stadge_people_moscow/data/providers/orders_provider.dart';
@@ -20,6 +18,8 @@ import 'package:stadge_people_moscow/data/models/auth_model.dart';
 class _MockAuthService extends AuthService {
   @override
   Future<AuthResponse> login(LoginRequest request) async {
+    // Имитируем задержку сети, чтобы состояние loading успело отрисоваться.
+    await Future.delayed(const Duration(milliseconds: 100));
     return AuthResponse(
       token: 'mock_token',
       userId: 'user_001',
@@ -56,7 +56,7 @@ class _MockOrderService extends OrderService {
   @override
   Future<List<OrderModel>> getOrders({String? category}) async {
     return [
-      OrderModel(
+      const OrderModel(
         id: 'order_001',
         title: 'FOH-инженер, фестиваль',
         description: 'Работа на фестивале',
@@ -107,8 +107,7 @@ void main() {
 
   // ─── Login Screen Tests ───
 
-  testWidgets('Login screen renders correctly',
-      (WidgetTester tester) async {
+  testWidgets('Login screen renders correctly', (WidgetTester tester) async {
     await tester.pumpWidget(
       buildApp(),
     );
@@ -135,8 +134,7 @@ void main() {
     GoRouter.of(context).go('/login');
     await tester.pumpAndSettle();
 
-    await tester.enterText(
-        find.byType(TextFormField).at(1), 'password123');
+    await tester.enterText(find.byType(TextFormField).at(1), 'password123');
     await tester.tap(find.text('Вход'));
     await tester.pump();
 
@@ -158,7 +156,16 @@ void main() {
     await tester.tap(find.text('Вход'));
     await tester.pump();
 
-    expect(find.text('Введите пароль'), findsOneWidget);
+    // Check that the password field has an error (at least one Text widget
+    // with the error text, excluding the hintText).
+    final passwordField = find.byType(TextFormField).at(1);
+    expect(
+      find.descendant(
+        of: passwordField,
+        matching: find.text('Введите пароль'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('Login screen shows loading on submit',
@@ -174,18 +181,20 @@ void main() {
 
     await tester.enterText(
         find.byType(TextFormField).at(0), 'test@example.com');
-    await tester.enterText(
-        find.byType(TextFormField).at(1), 'password123');
+    await tester.enterText(find.byType(TextFormField).at(1), 'password123');
     await tester.tap(find.text('Вход'));
     await tester.pump();
 
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    // Доводим мок-задержку до конца, чтобы не осталось pending-таймеров.
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle();
   });
 
   // ─── Register Screen Tests ───
 
-  testWidgets('Register screen renders correctly',
-      (WidgetTester tester) async {
+  testWidgets('Register screen renders correctly', (WidgetTester tester) async {
     await tester.pumpWidget(
       buildApp(),
     );
@@ -231,8 +240,7 @@ void main() {
     // Fill login form
     await tester.enterText(
         find.byType(TextFormField).at(0), 'test@example.com');
-    await tester.enterText(
-        find.byType(TextFormField).at(1), 'password123');
+    await tester.enterText(find.byType(TextFormField).at(1), 'password123');
     await tester.tap(find.text('Вход'));
     await tester.pumpAndSettle();
 

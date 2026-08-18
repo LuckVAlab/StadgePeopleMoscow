@@ -55,9 +55,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      final message = e is ApiErrorInfo
-          ? e.message
-          : 'Ошибка входа. Проверьте данные.';
+      final message =
+          e is ApiErrorInfo ? e.message : 'Ошибка входа. Проверьте данные.';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
@@ -118,7 +117,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     AppTextField(
                       controller: _passwordController,
                       label: 'Пароль',
-                      hintText: 'Введите пароль',
+                      hintText: 'Минимум 6 символов',
                       obscureText: _obscurePassword,
                       suffixIcon: GestureDetector(
                         onTap: () => setState(

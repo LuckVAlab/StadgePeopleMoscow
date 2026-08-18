@@ -12,6 +12,9 @@ import 'package:stadge_people_moscow/widgets/app_tag.dart';
 
 class OrderDetailsScreen extends ConsumerStatefulWidget {
   final String orderId;
+
+  /// Optional snapshot passed via navigation for instant first render.
+  /// The live order is always read from ordersProvider.
   final OrderModel? order;
 
   const OrderDetailsScreen({
@@ -25,31 +28,45 @@ class OrderDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
-  bool _hasResponded = false;
   bool _isResponding = false;
-  late final OrderModel _order;
-  late final String _orderId;
   AuthResponse? _currentUser;
-  bool _hasData = false;
+  OrderModel? _currentOrder;
+
+  bool get _hasResponded {
+    final specialistId = _currentUser?.userId;
+    final order = _currentOrder;
+    if (specialistId == null || order == null) return false;
+    return order.applicants.contains(specialistId);
+  }
 
   @override
   void initState() {
     super.initState();
-    _orderId = widget.orderId;
     _currentUser = ref.read(authProvider.notifier).currentUser;
     if (widget.order == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) context.pop();
       });
-      return;
     }
-    _order = widget.order!;
-    _hasData = true;
+  }
+
+  /// Finds the order by id in the live provider state.
+  OrderModel? _findOrder(List<OrderModel>? orders) {
+    if (orders == null) return null;
+    for (final order in orders) {
+      if (order.id == widget.orderId) return order;
+    }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!_hasData) {
+    // Live order from the provider; navigation snapshot is only a fallback
+    // for the first render.
+    final order = _findOrder(ref.watch(ordersProvider).value) ?? widget.order;
+    _currentOrder = order;
+
+    if (order == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Детали заказа')),
         body: const Center(child: CircularProgressIndicator()),
@@ -81,7 +98,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _order.title,
+                    order.title,
                     style: AppTheme.title,
                   ),
                   const SizedBox(height: 8),
@@ -97,7 +114,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          _order.category,
+                          order.category,
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppTheme.primary,
@@ -106,7 +123,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        _order.price,
+                        order.price,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -124,16 +141,16 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildInfoSection('Основная информация', [
-                    ('Дата', _order.date),
-                    ('Место', _order.location),
-                    ('Время', _order.time),
+                    ('Дата', order.date),
+                    ('Место', order.location),
+                    ('Время', order.time),
                   ]),
                   const SizedBox(height: 24),
 
                   const Text('Описание', style: AppTheme.subtitle),
                   const SizedBox(height: 8),
                   Text(
-                    _order.description,
+                    order.description,
                     style: const TextStyle(
                       fontSize: 14,
                       color: AppTheme.textSecondary,
@@ -143,7 +160,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                   const SizedBox(height: 24),
 
                   // Tags / Requirements
-                  if (_order.tags.isNotEmpty)
+                  if (order.tags.isNotEmpty)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -152,7 +169,7 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: _order.tags.map((tag) {
+                          children: order.tags.map((tag) {
                             final style = tag.isUrgent
                                 ? TagStyle.urgent
                                 : TagStyle.normal;
@@ -167,12 +184,12 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
                     ),
 
                   _buildInfoSection('О заказчике', [
-                    ('Имя', _order.clientName),
-                    ('Телефон', _order.clientPhone),
+                    ('Имя', order.clientName),
+                    ('Телефон', order.clientPhone),
                     (
                       'Рейтинг',
-                      _order.clientRating != null
-                          ? '${_order.clientRating} ⭐'
+                      order.clientRating != null
+                          ? '${order.clientRating} ⭐'
                           : 'Новый'
                     ),
                   ]),
@@ -259,11 +276,12 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     setState(() => _isResponding = true);
 
     try {
+      final order = _currentOrder;
+      if (order == null) return;
+
       await ref
           .read(ordersProvider.notifier)
-          .respondToOrder(_orderId, specialistId);
-
-      setState(() => _hasResponded = true);
+          .respondToOrder(order, specialistId);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -50,13 +50,14 @@ class OrderService {
     }
   }
 
-  Future<OrderModel> respondToOrder(String orderId, String specialistId) async {
-    if (_useMock) return _mockRespondToOrder(orderId, specialistId);
+  Future<OrderModel> respondToOrder(
+      OrderModel order, String specialistId) async {
+    if (_useMock) return _mockRespondToOrder(order, specialistId);
 
     try {
       final dio = DioClient.instance.dio;
       final response = await dio.post(
-        '${ApiConstants.orders}/$orderId/respond',
+        '${ApiConstants.orders}/${order.id}/respond',
         data: {'specialistId': specialistId},
       );
       return OrderModel.fromJson(response.data);
@@ -156,23 +157,13 @@ class OrderService {
   }
 
   Future<OrderModel> _mockRespondToOrder(
-      String orderId, String specialistId) async {
+      OrderModel order, String specialistId) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    return OrderModel(
-      id: orderId,
-      title: 'Mock Order',
-      description: 'Mock',
-      category: 'Техник',
-      price: '0 ₽',
-      priceCents: 0,
-      date: '---',
-      location: '---',
-      time: '---',
-      clientId: '---',
-      clientName: '---',
-      clientPhone: '---',
-      applicants: [specialistId],
-      status: 'in_progress',
+    return order.copyWith(
+      applicants: order.applicants.contains(specialistId)
+          ? order.applicants
+          : [...order.applicants, specialistId],
+      updatedAt: DateTime.now(),
     );
   }
 }

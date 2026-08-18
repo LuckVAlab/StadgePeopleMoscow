@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:stadge_people_moscow/main.dart';
+import 'package:stadge_people_moscow/screens/main_screen.dart';
 import 'package:stadge_people_moscow/data/services/storage_service.dart';
 
 void main() {
@@ -18,14 +19,15 @@ void main() {
     await StorageService.instance.init();
   });
 
-  testWidgets('App launches and shows login screen',
+  testWidgets('App launches and shows main screen with feed',
       (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(
       const ProviderScope(child: StadgePeopleMoscowApp()),
     );
+    await tester.pumpAndSettle();
 
-    // Verify that login screen appears
-    expect(find.text('Вход'), findsOneWidget);
+    // Verify that main screen appears
+    expect(find.byType(MainScreen), findsOneWidget);
   });
 }
