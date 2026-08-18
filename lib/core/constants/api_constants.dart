@@ -6,7 +6,7 @@ class ApiConstants {
 
   // Local development backend (Express + SQLite).
   // For production, replace with https://api.stadgepeople.moscow/v1
-  static const String baseUrl = 'http://localhost:3000/v1';
+  static const String baseUrl = 'http://localhost:8081/v1';
 
   // Endpoints
   static const String login = '/auth/login';

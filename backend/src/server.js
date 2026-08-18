@@ -45,7 +45,7 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ message: 'Ошибка сервера. Попробуйте позже.' });
 });
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`✅ Server running on http://localhost:${port}`);
   console.log(`   API base: http://localhost:${port}/v1`);
