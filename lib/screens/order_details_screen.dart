@@ -74,6 +74,9 @@ class _OrderDetailsScreenState extends ConsumerState<OrderDetailsScreen> {
     }
 
     final authState = ref.watch(authProvider).value;
+    // Refresh _currentUser on every rebuild so session restoration
+    // (which happens asynchronously in AuthNotifier) is reflected.
+    _currentUser = ref.read(authProvider.notifier).currentUser;
     final specialistId =
         authState == AuthStatus.authenticated ? _currentUser?.userId : null;
 
